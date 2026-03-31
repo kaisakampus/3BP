@@ -10,19 +10,14 @@ import re
 import datetime
 import importlib
 import time
-
-# MATPLOTLIB
 import matplotlib
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 from matplotlib import colors as mcolors
-
 matplotlib.use("tkagg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from matplotlib.animation import FuncAnimation
-
-# CUSTOM MODULES
 import data_analysis
 
 # SET GUI THEME
@@ -33,10 +28,8 @@ customtkinter.set_default_color_theme("dark-blue")
 CWDDIR = Path.cwd()
 
 # STARTUP TERMINAL MESSAGE
-print(" \n--Starting up 3D Multi-Body Stellar Simulator--\n")
+print(" \nPreparing The Window\n")
 
-
-# APP
 class app(customtkinter.CTk):
     def __init__(self):
         customtkinter.CTk.__init__(self)
@@ -44,7 +37,7 @@ class app(customtkinter.CTk):
         self.popup = None
         self.anim = None
         self.current_fig = None
-        self.last_simulation_data = None  # Store last simulation info
+        self.last_simulation_data = None  # store last simulation info
 
         def show_error(exc: Exception):
             def show():
@@ -96,13 +89,14 @@ class app(customtkinter.CTk):
 
             # Close the window
 
-            print("\n--Shutting down 3D Multi-Body Stellar Simulator--\n")
+            print("\nClosing The Window\n")
             self.quit()
             self.destroy()
 
         # NOW set the protocol (after the function is defined)
         self.protocol("WM_DELETE_WINDOW", on_closing)
 
+# SUS
         def get_path(body):
             # Debugging
             if body == -1:
@@ -205,7 +199,7 @@ class app(customtkinter.CTk):
 
             canvas.draw()
 
-
+# SUS
         def show_statistics(duration, precision, selection):
             # constants
             NUM_BODIES = len([f for f in os.listdir(get_path(-1)) if f.startswith('body') and f.endswith('.csv')])
@@ -221,7 +215,7 @@ class app(customtkinter.CTk):
                 print("ERROR: Reference data not found!")
                 print("#" * 60)
                 print(f"\nMissing: {path_reference}")
-                print("\nPlease run the IAS15 reference simulation first before")
+                print("\nPlease run the reference simulation first before")
                 print("comparing results. Select IAS15 as the integrator and")
                 print("run a simulation with precision 0.0005 to generate reference data.")
                 return
@@ -309,151 +303,8 @@ class app(customtkinter.CTk):
             print(f"Max Trajectory Error: {traj_max:.4e}%")
             print(f"Max Hamiltonian Error: {ham_max:.4e}%\n")
 
-        def show_lyapunov_analysis():
-
-            if self.last_simulation_data is None:
-                self.lyapunov_status.configure(text="Please run a simulation first")
-                return
-
-            # Update status
-            self.lyapunov_status.configure(text="Calculating Lyapunov exponents...")
-            self.update()
-
-            # Extract simulation parameters
-            NUM_BODIES = self.last_simulation_data['num_bodies']
-            masses = self.last_simulation_data['masses']
-            precision = self.last_simulation_data['precision']
-
-            # Read simulated data
-            path_simulation = get_path(-1)
-            simulated_data = data_analysis.read_phase_space(NUM_BODIES, path_simulation)
-
-            # Read timestep sizes from CSV
-            timestep_sizes = data_analysis.read_timestep_sizes(path_simulation)
-
-            # Calculate Lyapunov exponents
-            start_time = time.time()
-
-            lyapunov_spectrum, lyapunov_time, exponents_over_time, time_points, sorted_indices = \
-                data_analysis.calculate_lyapunov_exponents(simulated_data, masses,
-                                                           timestep_sizes=timestep_sizes,
-                                                           renorm_interval=10)
-
-            # Convert time_points from sim units to display seconds
-            time_points_seconds = [t for t in time_points]
-
-            # Convert Lyapunov exponents from 1/sim_unit to 1/second for display
-            lyapunov_spectrum_display = lyapunov_spectrum * 24.0
-            lyapunov_time_seconds = lyapunov_time / 24.0
-
-            calc_time = time.time() - start_time
-
-            self.lyapunov_status.pack_forget()
-
             # Create visualization
             fig3 = plt.figure(figsize=(12, 10))
-
-            # Plot 1: Full Lyapunov Spectrum (bar plot)
-            ax1 = plt.subplot(3, 1, 1)
-            indices = np.arange(len(lyapunov_spectrum_display))
-            colors_spectrum = ['red' if x > 0 else 'blue' if x < 0 else 'gray' for x in lyapunov_spectrum_display]
-            ax1.bar(indices, lyapunov_spectrum_display, color=colors_spectrum, alpha=0.7, edgecolor='black')
-            ax1.axhline(y=0, color='black', linestyle='-', linewidth=0.8)
-
-            # Create dimension labels for x-axis based on original (unsorted) indices
-            # For 3 bodies: x1,y1,z1,vx1,vy1,vz1, x2,y2,z2,vx2,vy2,vz2, x3,y3,z3,vx3,vy3,vz3
-            all_dimension_labels = []
-            coord_names = ['x', 'y', 'z', 'vx', 'vy', 'vz']
-            for body in range(1, NUM_BODIES + 1):
-                for coord in coord_names:
-                    all_dimension_labels.append(f'{coord}{body}')
-
-            # Map sorted indices to their original dimension labels
-            dimension_labels_sorted = [all_dimension_labels[idx] for idx in sorted_indices]
-
-            # Set x-axis with dimension labels
-            ax1.set_xticks(indices)
-            ax1.set_xticklabels(dimension_labels_sorted, rotation=45, ha='right', fontsize=8)
-            ax1.set_xlabel('Phase Space Dimension (sorted by λ value)', fontsize=11)
-            ax1.set_ylabel('Lyapunov Exponent λ_i (1/s)', fontsize=11)
-            ax1.set_title('Full Lyapunov Spectrum (sorted descending)', fontsize=12, fontweight='bold')
-            ax1.grid(True, alpha=0.3, axis='y')
-
-            # Add text annotation for max exponent
-            if len(lyapunov_spectrum_display) > 0:
-                ax1.text(0.02, 0.98,
-                         f'λ_max = {lyapunov_spectrum_display[0]:.4e} /s ({dimension_labels_sorted[0]})\nt_L = {lyapunov_time_seconds:.4e} s',
-                         transform=ax1.transAxes, fontsize=10, verticalalignment='top',
-                         bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-
-            # Plot 2: Evolution of top 6 exponents over renormalization steps
-            ax2 = plt.subplot(3, 1, 2)
-            if len(exponents_over_time) > 0 and len(time_points) > 0:
-                # Convert exponents to 1/second
-                exponents_array = np.array(exponents_over_time) * 24.0
-                time_array = np.array(time_points_seconds)
-
-                # Get indices of top 3 (most positive) and bottom 3 (most negative)
-                top_3_indices = list(range(3))
-                bottom_3_indices = list(range(len(lyapunov_spectrum_display) - 3, len(lyapunov_spectrum_display)))
-                indices_to_plot = top_3_indices + bottom_3_indices
-
-                # Distinct colors for each exponent
-                exponent_colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#a65628']
-
-                for idx, i in enumerate(indices_to_plot):
-                    # Scatter points
-                    ax2.scatter(time_array, exponents_array[:, i],
-                                label=f'{dimension_labels_sorted[i]}: {lyapunov_spectrum_display[i]:.3e} /s',
-                                s=50, color=exponent_colors[idx], alpha=0.8)
-
-            
-                ax2.axhline(y=0, color='black', linestyle='--', linewidth=0.8)
-                ax2.set_xlabel('Time (s)', fontsize=11)
-                ax2.set_ylabel('Lyapunov Exponent (1/s)', fontsize=11)
-                ax2.set_title('Evolution of Top 6 Lyapunov Exponents (by magnitude)', fontsize=12, fontweight='bold')
-                ax2.legend(loc='best', fontsize=9)
-                ax2.grid(True, alpha=0.3)
-
-            # Plot 3: Phase space volume preservation (sum of exponents)
-            ax3 = plt.subplot(3, 1, 3)
-            if len(exponents_over_time) > 0:
-                # Convert exponents to 1/second
-                exponents_array = np.array(exponents_over_time) * 24.0
-                time_array = np.array(time_points_seconds)
-                sum_exponents = np.sum(exponents_array, axis=1)
-
-                # Scatter points
-                ax3.scatter(time_array, sum_exponents, s=50, color='green', label='Σλ_i')
-
-                ax3.axhline(y=0, color='black', linestyle='--', linewidth=0.8)
-                ax3.set_xlabel('Time (s)', fontsize=11)
-                ax3.set_ylabel('Sum of Exponents (1/s)', fontsize=11)
-                ax3.set_title('Phase Space Volume Preservation (Liouville\'s Theorem)', fontsize=12, fontweight='bold')
-                ax3.legend(loc='best', fontsize=9)
-                ax3.grid(True, alpha=0.3)
-
-                # Annotation about Liouville's theorem
-                final_sum = sum_exponents[-1] if len(sum_exponents) > 0 else 0
-                ax3.text(0.02, 0.98, f'Final Σλ_i = {final_sum:.4e} /s\n(Should be ≈ 0 for Hamiltonian systems)',
-                         transform=ax3.transAxes, fontsize=9, verticalalignment='top',
-                         bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.5))
-            plt.tight_layout()
-
-            # Save figure
-            dt_str = f"{precision:g}".replace(".", "p")
-            out = Path(str(CWDDIR)) / "Statistics" / f"{self.dropdown1.get()}_Lyapunov_dT_{dt_str}.png"
-            out.parent.mkdir(parents=True, exist_ok=True)
-            plt.savefig(out, dpi=300, bbox_inches="tight")
-
-            # Clear old plot and display new one
-            for widget in self.lyapunov_frame.winfo_children():
-                widget.destroy()
-
-            canvas3 = FigureCanvasTkAgg(fig3, self.lyapunov_frame)
-            canvas_widget3 = canvas3.get_tk_widget()
-            canvas_widget3.pack(fill="both", expand=True)
-            canvas3.draw()
 
         # logic for custom button
         def custom():
