@@ -22,11 +22,12 @@ from matplotlib.figure import Figure
 from matplotlib.animation import FuncAnimation
 import data_analysis
 
-# CONSTANTS
-NUM_BODIES = 3
+# initial conditions from data_list
+figure8 = [(2.57429,0,0),1,(0.216343,0.332029,0),(-2.57429,0,0),1,(0.216343,0.332029,0),(0,0,0),1,(-0.432686,-0.664058,0)]
+#yarn = [(-7.17921,0,0),1,(0.208677,0.130401,0),(7.17921,0,0),1,(0.208677,0.130401,0),(0,0,0),1,(-0.417354,-0.260802,0)]
+#yinyang = [(-8.57406,0,0),1,(0.175521,0.104039,0),(8.57406,0,0),1,(0.175521,0.104039,0),(0,0,0),1,(-0.351042,-0.208078,0)]
 
-# setting cwd directory
-CWDDIR = Path.cwd()
+NUM_BODIES = 3
 
 # what the hell is a data list?
 def Simulate(data_list, precision, duration):
@@ -85,7 +86,6 @@ def acceleration_components(pos, body, MASS, NUM_BODIES):
             az += MASS[other] * rz / r3
 
     return ax, ay, az
-
 
 def ode_system(t, f, MASS, NUM_BODIES):
 
@@ -161,25 +161,8 @@ def position_sampled(TIMESTEP, TOTAL_STEPS, SAMPLE_EVERY, NUM_BODIES, START_POS,
     states = states.reshape(-1, NUM_BODIES, 6) # (T, N, 6)
     frames = states.transpose(1, 0, 2) # (N, T, 6)
 
-    '''# from the other version
-    # result.y shape: (6*NUM_BODIES, len(t_eval))
-    pos = result.y[:3 * NUM_BODIES].reshape(NUM_BODIES, 3, -1).transpose(0, 2, 1)
-    vel = result.y[3 * NUM_BODIES:].reshape(NUM_BODIES, 3, -1).transpose(0, 2, 1)
-
-    # Build frames array: (NUM_BODIES, OUT_STEPS, 6)
-    actual_out_steps = pos.shape[1] # shape: (time, 6*N)
-    frames = np.zeros((NUM_BODIES, actual_out_steps, 6), dtype=np.float64)
-    frames[:, :, 0:3] = pos
-    frames[:, :, 3:6] = vel'''
-
-
     # timestep sizes (important for animation timing)
     timestep_size_list = np.zeros(len(times), dtype=np.float64)
-
-# initial version
-    '''timestep_size_list[0] = TIMESTEP * SAMPLE_EVERY  # first frame
-    if actual_out_steps > 1:
-        timestep_size_list[1:] = np.diff(result.t)'''
 
 # the other version - WHAT IN THE WORLD IS HAPPENING HERE
     if len(times) > 1:
@@ -260,13 +243,7 @@ def calculate_trajectory_error(reference_data, simulated_data, frame_idx):
     diff_norm = np.linalg.norm(ref_vec - sim_vec)
     return (diff_norm / ref_norm) * 100.0
 
-
-def calculate_totE(phase_space_data, masses, G=1.0, softening=SOFTENING):
-    """
-    total energy of the system.
-    Uses Plummer softening: phi = -Gm/sqrt(r^2 + eps^2)
-    This MUST match the simulation's force law.
-    """
+def calculate_totE(phase_space_data, masses, G=1.0, softening=SOFTENING): # Uses Plummer softening: phi = -Gm/sqrt(r^2 + eps^2)
     num_bodies = len(phase_space_data)
     
     # Kinetic energy: T = (1/2) * sum m_i * v_i^2
@@ -293,7 +270,6 @@ def calculate_totE(phase_space_data, masses, G=1.0, softening=SOFTENING):
             V -= G * masses[i] * masses[j] / r_soft
     
     return T + V
-
 
 def calculate_totE_error(simulated_data, masses, initial_H, frame_idx, G=1.0, softening=SOFTENING):
     current_state = []
@@ -340,7 +316,7 @@ def calculate_max_error(errors, dt=1.0):
     # original vs perturbation trajectory accuracy plot
     # energy fluctuations: When comparing perturbations, plot delta E relative to the original system
 
-# SET GUI THEME
+# GUI theme
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("green")
 print(" \nCreating The Window\n")
