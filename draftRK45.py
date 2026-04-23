@@ -1,4 +1,4 @@
-# the order is heavility inspired by RK45 code snippet from https://github.com/LBrink05/Project-Period-3D-Simulations-of-Multi-Body-Star-Systems
+# the order is heavily inspired by RK45 code snippet from https://github.com/LBrink05/Project-Period-3D-Simulations-of-Multi-Body-Star-Systems
 
 import numpy as np
 from pathlib import Path
@@ -26,6 +26,7 @@ import data_analysis
 figure8 = [(2.57429,0,0),1,(0.216343,0.332029,0),(-2.57429,0,0),1,(0.216343,0.332029,0),(0,0,0),1,(-0.432686,-0.664058,0)]
 #yarn = [(-7.17921,0,0),1,(0.208677,0.130401,0),(7.17921,0,0),1,(0.208677,0.130401,0),(0,0,0),1,(-0.417354,-0.260802,0)]
 #yinyang = [(-8.57406,0,0),1,(0.175521,0.104039,0),(8.57406,0,0),1,(0.175521,0.104039,0),(0,0,0),1,(-0.351042,-0.208078,0)]
+
 
 NUM_BODIES = 3
 
