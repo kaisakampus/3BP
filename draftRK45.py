@@ -3,7 +3,13 @@
 import numpy as np
 from pathlib import Path
 from scipy.integrate import RK45
-import csv
+
+# Convert to Python floats immediately
+rt32 = float(np.sqrt(3)/2)
+v = float(np.sqrt(1/(5*np.sqrt(3))))
+rt32_times_5 = float(rt32 * 5)
+v_times_rt32 = float(v * rt32)
+v_div_2 = float(v / 2)
 
 # initial conditions
 figure8 = [(2.57429,0,0),1,(0.216343,0.332029,0),(-2.57429,0,0),1,(0.216343,0.332029,0),(0,0,0),1,(-0.432686,-0.664058,0)]
@@ -11,8 +17,11 @@ yarn = [(-7.17921,0,0),1,(0.208677,0.130401,0),(7.17921,0,0),1,(0.208677,0.13040
 yinyang = [(-8.57406,0,0),1,(0.175521,0.104039,0),(8.57406,0,0),1,(0.175521,0.104039,0),(0,0,0),1,(-0.351042,-0.208078,0)]
 equilateraltriangle = [(5, 0, 0),1.0,(0.0, v, 0.0),(-2.5, rt32_times_5, 0.0),1.0,(-v_times_rt32, -v_div_2, 0.0),(-2.5, -rt32_times_5, 0.0),1.0,(v_times_rt32, -v_div_2, 0.0)]
 
-figure8 = data_list
 NUM_BODIES = 3
+# Softening constant - MUST match the simulation (see acceleration_components)
+SOFTENING = 0.001
+# Output interval from simulation - frames are saved at fixed intervals of out_dt
+OUTPUT_DT = 1.0  # simulation time units between output frames
 
 def Simulate(data_list, precision, duration):
     # extracting the data
@@ -81,9 +90,6 @@ def ode_system(t, f, MASS, NUM_BODIES):
 
     for b in range(NUM_BODIES):
         acc[b] = acceleration_components(pos, b, MASS, NUM_BODIES)
-        '''acc[b, 0] = ax
-        acc[b, 1] = ay
-        acc[b, 2] = az'''
 
     dydt = np.zeros_like(f)
 
@@ -115,7 +121,7 @@ def position_sampled(TIMESTEP, TOTAL_STEPS, SAMPLE_EVERY, NUM_BODIES, START_POS,
         t_bound=t_end,
         rtol=1e-9,
         atol=1e-12,
-        max_step=TIMESTEP # smaller steps than timestep, adaptive
+        max_step=np.inf # adaptive
     )
 
     states = []
@@ -144,30 +150,20 @@ def position_sampled(TIMESTEP, TOTAL_STEPS, SAMPLE_EVERY, NUM_BODIES, START_POS,
     frames = states.transpose(1, 0, 2) # (N, T, 6)
 
     # timestep sizes (important for animation timing)
-    timestep_size_list = np.zeros(len(times), dtype=np.float64)
+    timestep_size_list = np.arange(1, len(times) + 1)
+
+    #timestep_size_list = np.zeros(len(times), dtype=np.float64)
 
 # the other version - WHAT IN THE WORLD IS HAPPENING HERE
-    if len(times) > 1:
-        timestep_size_list[1:] = np.diff(times)
-        timestep_size_list[0] = timestep_size_list[1]
-    else:
-        timestep_size_list[0] = TIMESTEP
+    #if len(times) > 1:
+        #timestep_size_list[1:] = np.diff(times)
+        #timestep_size_list[0] = timestep_size_list[1]
+    #else:
+        #timestep_size_list[0] = TIMESTEP
 
     return frames, timestep_size_list
 
-# Convert to Python floats immediately
-rt32 = float(np.sqrt(3)/2)
-v = float(np.sqrt(1/(5*np.sqrt(3))))
-rt32_times_5 = float(rt32 * 5)
-v_times_rt32 = float(v * rt32)
-v_div_2 = float(v / 2)
-
-# Softening constant - MUST match the simulation (see acceleration_components)
-SOFTENING = 0.001
-
-# Output interval from simulation - frames are saved at fixed intervals of out_dt
-OUTPUT_DT = 1.0  # simulation time units between output frames
-
+# structuring the data in body files
 def read_phase_space(NUM_BODIES, path):
     
     phase_space_data = []
@@ -208,3 +204,10 @@ def calculate_trajectory_error(reference_data, simulated_data, frame_idx):
     
     diff_norm = np.linalg.norm(ref_vec - sim_vec)
     return (diff_norm / ref_norm) * 100.0
+
+Simulate(equilateraltriangle, 0.005, 100)
+acceleration_components()
+ode_system()
+position_sampled()
+read_phase_space()
+calculate_trajectory_error()
