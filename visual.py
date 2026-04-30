@@ -7,6 +7,25 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from matplotlib.animation import FuncAnimation
 
+'''def calculate_trajectory_error(reference_data, simulated_data, frame_idx):
+    ref_vec = []
+    sim_vec = []
+    
+    for ref_body, sim_body in zip(reference_data, simulated_data):
+        if frame_idx < len(ref_body) and frame_idx < len(sim_body):
+            ref_vec.extend(ref_body[frame_idx])
+            sim_vec.extend(sim_body[frame_idx])
+    
+    ref_vec = np.array(ref_vec)
+    sim_vec = np.array(sim_vec)
+    
+    ref_norm = np.linalg.norm(ref_vec)
+    if ref_norm == 0:
+        return float('inf')
+    
+    diff_norm = np.linalg.norm(ref_vec - sim_vec)
+    return (diff_norm / ref_norm) * 100.0'''
+
 '''def error_function(reference_data, simulated_data, masses):
     initial_state = [body_data[0] for body_data in simulated_data]
     initial_H = calculate_hamiltonian(initial_state, masses)

@@ -4,22 +4,12 @@ import numpy as np
 from pathlib import Path
 from scipy.integrate import RK45
 
-# Convert to Python floats immediately
-rt32 = float(np.sqrt(3)/2)
-v = float(np.sqrt(1/(5*np.sqrt(3))))
-rt32_times_5 = float(rt32 * 5)
-v_times_rt32 = float(v * rt32)
-v_div_2 = float(v / 2)
-
 # initial conditions
 figure8 = [(2.57429,0,0),1,(0.216343,0.332029,0),(-2.57429,0,0),1,(0.216343,0.332029,0),(0,0,0),1,(-0.432686,-0.664058,0)]
 yarn = [(-7.17921,0,0),1,(0.208677,0.130401,0),(7.17921,0,0),1,(0.208677,0.130401,0),(0,0,0),1,(-0.417354,-0.260802,0)]
 yinyang = [(-8.57406,0,0),1,(0.175521,0.104039,0),(8.57406,0,0),1,(0.175521,0.104039,0),(0,0,0),1,(-0.351042,-0.208078,0)]
-equilateraltriangle = [(5, 0, 0),1.0,(0.0, v, 0.0),(-2.5, rt32_times_5, 0.0),1.0,(-v_times_rt32, -v_div_2, 0.0),(-2.5, -rt32_times_5, 0.0),1.0,(v_times_rt32, -v_div_2, 0.0)]
 
 NUM_BODIES = 3
-# Softening constant - MUST match the simulation (see acceleration_components)
-SOFTENING = 0.001
 # Output interval from simulation - frames are saved at fixed intervals of out_dt
 OUTPUT_DT = 1.0  # simulation time units between output frames
 
@@ -50,6 +40,8 @@ def Simulate(data_list, precision, duration):
 
     timestep_path = my_dir / "timestep_sizes.csv"
     np.savetxt(timestep_path, timestep_size_list, delimiter=",")
+
+    return frames, timestep_size_list
 
 
 # some physics
@@ -186,28 +178,11 @@ def read_phase_space(NUM_BODIES, path):
     
     return phase_space_data
 
-def calculate_trajectory_error(reference_data, simulated_data, frame_idx):
-    ref_vec = []
-    sim_vec = []
-    
-    for ref_body, sim_body in zip(reference_data, simulated_data):
-        if frame_idx < len(ref_body) and frame_idx < len(sim_body):
-            ref_vec.extend(ref_body[frame_idx])
-            sim_vec.extend(sim_body[frame_idx])
-    
-    ref_vec = np.array(ref_vec)
-    sim_vec = np.array(sim_vec)
-    
-    ref_norm = np.linalg.norm(ref_vec)
-    if ref_norm == 0:
-        return float('inf')
-    
-    diff_norm = np.linalg.norm(ref_vec - sim_vec)
-    return (diff_norm / ref_norm) * 100.0
+frames, timesteps = Simulate(figure8, 0.005, 100)
+path = Path.cwd() / "Simulated_Data"
+sim_data = read_phase_space(NUM_BODIES, path)
 
-Simulate(equilateraltriangle, 0.005, 100)
-acceleration_components()
-ode_system()
-position_sampled()
-read_phase_space()
-calculate_trajectory_error()
+print("\n output of 10 rows for each body")
+for body in range(NUM_BODIES):
+    print(f"\nBody {body}:")
+    print(frames[body][:10])
