@@ -1,8 +1,4 @@
 # the order is heavily inspired by RK45 code snippet from https://github.com/LBrink05/Project-Period-3D-Simulations-of-Multi-Body-Star-Systems
-import os
-from github import Github
-from dotenv import load_dotenv
-token = os.getenv("GITHUB_TOKEN")
 import numpy as np
 import time
 from pathlib import Path
@@ -31,8 +27,8 @@ def Simulate(data_list, precision, run_name):
     frames, timestep_size_list = position_sampled(
         sample_every, NUM_BODIES, start_pos, start_vel, mass)
 
-    # save CSV files to github repository kaisakampus/3BP
-    PATH_FILES = Path.cwd()
+    # save CSV files to computer folder Simulated_Data
+    PATH_FILES = Path(r"C:\Users\kaisa\My Drive")
     my_dir = PATH_FILES / "Simulated_Data"
     my_dir.mkdir(parents=True, exist_ok=True)
 
@@ -209,7 +205,8 @@ start = time.time()
 frames, timesteps = Simulate(figure8, 0.005, "figure8")
 end = time.time()
 
-path = Path.cwd() / "Simulated_Data"
+#path = Path.cwd() / "Simulated_Data"
+path = Path(r"C:\Users\kaisa\My Drive\Simulated_Data")
 
 sim_data = read_phase_space(NUM_BODIES, path, "figure8")
 print(f"Simulation computations lasted {end - start:.2f} s")
