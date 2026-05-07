@@ -1,5 +1,8 @@
 # the order is heavily inspired by RK45 code snippet from https://github.com/LBrink05/Project-Period-3D-Simulations-of-Multi-Body-Star-Systems
-
+import os
+from github import Github
+from dotenv import load_dotenv
+token = os.getenv("GITHUB_TOKEN")
 import numpy as np
 import time
 from pathlib import Path
