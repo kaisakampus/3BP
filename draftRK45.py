@@ -12,7 +12,7 @@ yinyang = [(-8.57406,0,0),1,(0.175521,0.104039,0),(8.57406,0,0),1,(0.175521,0.10
 
 NUM_BODIES = 3
 
-def Simulate(data_list, precision, duration):
+def Simulate(data_list, precision, run_name):
     # extracting the initial coniditons from the configuration line
     # with float64 no calculation can be more precise than 16 decimal digits
     mass = np.array([data_list[1], data_list[4], data_list[7]], dtype=np.float64)
@@ -21,14 +21,12 @@ def Simulate(data_list, precision, duration):
 
     # conditions for time and frames
     timestep = float(precision)
-    total_steps = int(duration * 24 / timestep) + 1  # to include t=0
+    #total_steps = int(duration * 24 / timestep) + 1  # to include t=0
     sample_every = max(1, int(1 / timestep))
 
     # the saved frames should correspond to the sampled position
     frames, timestep_size_list = position_sampled(
-        timestep, total_steps, sample_every,
-        NUM_BODIES, start_pos, start_vel, mass
-    )
+        sample_every, NUM_BODIES, start_pos, start_vel, mass)
 
     # save CSV files to github repository kaisakampus/3BP
     PATH_FILES = Path.cwd()
@@ -37,10 +35,10 @@ def Simulate(data_list, precision, duration):
 
     # all sampled coordinates of each body are stored
     for body in range(NUM_BODIES):
-        path = my_dir / f"body{body}.csv"
+        path = my_dir / f"{run_name}_body{body}.csv"
         np.savetxt(path, frames[body], delimiter=",")
     # all sampled timesteps are stored
-    timestep_path = my_dir / "timestep_sizes.csv"
+    timestep_path = my_dir / f"{run_name}_timestep_sizes.csv"
     np.savetxt(timestep_path, timestep_size_list, delimiter=",")
     
     return frames, timestep_size_list
@@ -65,7 +63,7 @@ def acceleration_components(pos, body, MASS, NUM_BODIES):
 
             # softening because another code had it
             # i suppose this is to better regulate close encounters
-            r2 = rx * rx + ry * ry + rz * rz + 0.001**2
+            r2 = rx * rx + ry * ry + rz * rz #+ 0.001**2
             r3 = r2 ** 1.5
 
             # new acceleration
@@ -102,7 +100,7 @@ def ode_system(t, f, MASS, NUM_BODIES):
 # Runs the RK45 integrator and samples every SAMPLE_EVERY steps.
 # Returns frames shaped (NUM_BODIES, OUT_STEPS, 6) with [x,y,z,vx,vy,vz].
 
-def position_sampled(TIMESTEP, TOTAL_STEPS, SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
+def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
 
     # timeline of all integration points
     t0 = 0.0
@@ -177,15 +175,15 @@ def position_sampled(TIMESTEP, TOTAL_STEPS, SAMPLE_EVERY, NUM_BODIES, START_POS,
     # timestep sizes (important for animation timing)
     timestep_size_list = np.concatenate([[0], np.diff(times)])
 
-    return frames, timestep_size_list, times
+    return frames, timestep_size_list
 
 # structuring the data in body files
-def read_phase_space(NUM_BODIES, path):
+def read_phase_space(NUM_BODIES, path, run_name):
     
     phase_space_data = []
     
     for b in range(NUM_BODIES):
-        path_b = str(path) + f"/body{b}.csv"
+        path_b = str(path) + f"/{run_name}_body{b}.csv"
         body_data = []
         
         with open(path_b, "r") as data:
@@ -202,26 +200,75 @@ def read_phase_space(NUM_BODIES, path):
     
     return phase_space_data
 
+print(f"figure 8")
 start = time.time()
 # 1 simulation time unit is like 200 internal steps with dt=0.005
-frames, timesteps = Simulate(figure8, 0.005, 100)
+frames, timesteps = Simulate(figure8, 0.005, "figure8")
 end = time.time()
 
 path = Path.cwd() / "Simulated_Data"
-sim_data = read_phase_space(NUM_BODIES, path)
 
+sim_data = read_phase_space(NUM_BODIES, path, "figure8")
 print(f"Simulation computations lasted {end - start:.2f} s")
 print(f"Total timesteps: {len(timesteps)}")
 
 print("\n output of 10 rows for each body")
 for body in range(NUM_BODIES):
-    print(f"\nBody {body}:")
+    print(f"\nfigure8_Body {body}:")
     print(frames[body][:10])
 
 print("\n output of 10 rows of timestep sizes")
-timestep_path = path / "timestep_sizes.csv"
+timestep_path = path / "figure8_timestep_sizes.csv"
 with open(timestep_path, "r") as f:
     for i, line in enumerate(f):
         if i >= 10:
             break
         print(line, end="")
+
+'''print(f"figure 8 added perturbation")
+start = time.time()
+frames, timesteps = Simulate(figure8add, 0.005, "figure8add")
+end = time.time()
+
+path = Path.cwd() / "Simulated_Data"
+
+sim_data = read_phase_space(NUM_BODIES, path, "figure8add")
+print(f"Simulation computations lasted {end - start:.2f} s")
+print(f"Total timesteps: {len(timesteps)}")
+
+print("\n output of 10 rows for each body")
+for body in range(NUM_BODIES):
+    print(f"\nfigure8add_Body {body}:")
+    print(frames[body][:10])
+
+print("\n output of 10 rows of timestep sizes")
+timestep_path = path / "figure8add_timestep_sizes.csv"
+with open(timestep_path, "r") as f:
+    for i, line in enumerate(f):
+        if i >= 10:
+            break
+        print(line, end="")
+
+print(f"figure 8 subtracted perturbation")
+start = time.time()
+frames, timesteps = Simulate(figure8sub, 0.005, "figure8sub")
+end = time.time()
+
+path = Path.cwd() / "Simulated_Data"
+
+sim_data = read_phase_space(NUM_BODIES, path, "figure8sub")
+print(f"Simulation computations lasted {end - start:.2f} s")
+print(f"Total timesteps: {len(timesteps)}")
+
+print("\n output of 10 rows for each body")
+for body in range(NUM_BODIES):
+    print(f"\nfigure8sub_Body {body}:")
+    print(frames[body][:10])
+
+print("\n output of 10 rows of timestep sizes")
+timestep_path = path / "figure8sub_timestep_sizes.csv"
+with open(timestep_path, "r") as f:
+    for i, line in enumerate(f):
+        if i >= 10:
+            break
+        print(line, end="")'''
