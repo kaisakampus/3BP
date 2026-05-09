@@ -126,8 +126,8 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
     times = []
     step_count = 0
 
-    COLLISION_THRESHOLD = 0.01   # bodies too close
-    ESCAPE_THRESHOLD = 100.0     # bodies too far apart
+    COLLISION_THRESHOLD = 0.001   # bodies too close
+    ESCAPE_THRESHOLD = 50.0     # bodies too far apart
 
     while solver.status == 'running':
         solver.step()
@@ -135,8 +135,8 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
         if step_count == 0:
             print("solver.y at step 0:", solver.y)
 
-        # print progress every 1000 steps
-        if step_count % 100000 == 0:
+        # print progress every x steps
+        if step_count % 1000000 == 0:
             print(f"Step NR. {step_count}, time of run thus far = {solver.t:.4f}, timestep = {solver.h_abs:.6f}")
         
         pos = solver.y[:3 * NUM_BODIES].reshape(NUM_BODIES, 3)
@@ -163,7 +163,6 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
 
         step_count += 1
 
-# first version
     # Extract positions and velocities
 
     # Convert to arrays

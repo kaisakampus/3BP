@@ -6,8 +6,6 @@ from scipy.integrate import RK45
 
 # initial conditions
 figure8 = [(2.57429,0,0),1,(0.216343,0.332029,0),(-2.57429,0,0),1,(0.216343,0.332029,0),(0,0,0),1,(-0.432686,-0.664058,0)]
-yarn = [(-7.17921,0,0),1,(0.208677,0.130401,0),(7.17921,0,0),1,(0.208677,0.130401,0),(0,0,0),1,(-0.417354,-0.260802,0)]
-yinyang = [(-8.57406,0,0),1,(0.175521,0.104039,0),(8.57406,0,0),1,(0.175521,0.104039,0),(0,0,0),1,(-0.351042,-0.208078,0)]
 
 NUM_BODIES = 3
 
@@ -123,14 +121,14 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
     times = []
     step_count = 0
 
-    COLLISION_THRESHOLD = 0.01   # bodies too close
-    ESCAPE_THRESHOLD = 100.0     # bodies too far apart
+    COLLISION_THRESHOLD = 0.001   # bodies too close
+    ESCAPE_THRESHOLD = 50.0     # bodies too far apart
 
     while solver.status == 'running':
         solver.step()
 
         # print progress every 1000 steps
-        if step_count % 100000 == 0:
+        if step_count % 1000000 == 0:
             print(f"Step NR. {step_count}, time of run thus far = {solver.t:.4f}, timestep = {solver.h_abs:.6f}")
         
         pos = solver.y[:3 * NUM_BODIES].reshape(NUM_BODIES, 3)
