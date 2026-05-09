@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 from scipy.integrate import RK45
 
-# initial conditions
+# initial conditions https://observablehq.com/@rreusser/periodic-planar-three-body-orbits#group=%C5%A0uvakov&sequence=Sheen&orbit=Loop-ended-triangles
 figure8 = [(2.57429,0,0),1,(0.216343,0.332029,0),(-2.57429,0,0),1,(0.216343,0.332029,0),(0,0,0),1,(-0.432686,-0.664058,0)]
 
 NUM_BODIES = 3
