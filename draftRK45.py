@@ -111,7 +111,7 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
         fun=lambda t, y: ode_system(t, y, MASS, NUM_BODIES),
         t0=t0,
         y0=f0,
-        t_bound=np.inf,
+        t_bound=10000, # used to be np.inf
         rtol=1e-9,
         atol=1e-12,
         max_step=np.inf # adaptive timestep

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\ovalswithflourishes"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\loopendedtriangles"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
@@ -22,7 +22,7 @@ ax.semilogy(cumulative_time, mag2, color="green", linewidth=1, label="body 2")
 
 ax.set_xlabel("simulation time t [–]")
 ax.set_ylabel("position magnitude |r| [–]")
-ax.set_title("ovals with flourishes (log)")
+ax.set_title("loopendedtriangles (log)")
 ax.legend()
 plt.tight_layout()
 plt.show()
@@ -43,6 +43,6 @@ ax.semilogy(cumulative_time, hyperradius, color="pink", linewidth=1)
 
 ax.set_xlabel("simulation time t [–]")
 ax.set_ylabel("hyperradius R [–]")
-ax.set_title("log total of ovals with flourishes")
+ax.set_title("log total of loopendedtriangles")
 plt.tight_layout()
 plt.show()

@@ -4,7 +4,7 @@ from pathlib import Path
 from scipy.integrate import RK45
 
 # initial conditions from https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
-loopendedtriangles = [(0.6661637520772179,0.081921852656887,0),1,(0.84120297540307,0.029746212757039,0),(-0.025192663684493022,0.45444857588251897,0),1,(0.142642469612081,-0.492315648524683,0),(-0.10301329374224,-0.765806200083609,0),1,(-0.98384544501151,0.462569435774018,0)]
+loopendedtriangleslowermax = [(0.6661637520772179,0.081921852656887,0),1,(0.84120297540307,0.029746212757039,0),(-0.025192663684493022,0.45444857588251897,0),1,(0.142642469612081,-0.492315648524683,0),(-0.10301329374224,-0.765806200083609,0),1,(-0.98384544501151,0.462569435774018,0)]
 
 NUM_BODIES = 3
 
@@ -116,9 +116,9 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
         fun=lambda t, y: ode_system(t, y, MASS, NUM_BODIES),
         t0=t0,
         y0=f0,
-        t_bound=np.inf,
-        rtol=1e-9,
-        atol=1e-12,
+        t_bound=100000,
+        rtol=3.162e-12, #9 before, 11 ok
+        atol=1e-13, # before 12
         max_step=np.inf # adaptive timestep
     )
 
@@ -126,8 +126,8 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
     times = []
     step_count = 0
 
-    COLLISION_THRESHOLD = 0.001   # bodies too close
-    ESCAPE_THRESHOLD = 50.0     # bodies too far apart
+    COLLISION_THRESHOLD = 0.0001   # bodies too close
+    ESCAPE_THRESHOLD = 100     # bodies too far apart, initial 50
 
     while solver.status == 'running':
         solver.step()
@@ -210,26 +210,26 @@ def read_phase_space(NUM_BODIES, path, run_name):
     
     return phase_space_data
 
-print(f"loopendedtriangles")
+print(f"loopendedtriangles lower max")
 start = time.time()
 # 1 simulation time unit is like 200 internal steps with dt=0.005
-frames, timesteps = Simulate(loopendedtriangles, 0.005, "loopendedtriangles")
+frames, timesteps = Simulate(loopendedtriangleslowermax, 0.005, "loopendedtriangleslowermax")
 end = time.time()
 
 #path = Path.cwd() / "Simulated_Data"
 path = Path(r"C:\Users\kaisa\My Drive\Simulated_Data")
 
-sim_data = read_phase_space(NUM_BODIES, path, "loopendedtriangles")
+sim_data = read_phase_space(NUM_BODIES, path, "loopendedtriangleslowermax")
 print(f"Simulation computations lasted {end - start:.2f} s")
 print(f"Total timesteps: {len(timesteps)}")
 
 print("\n output of 10 rows for each body")
 for body in range(NUM_BODIES):
-    print(f"\nloopendedtriangles_Body {body}:")
+    print(f"\nloopendedtriangleslowermax_Body {body}:")
     print(frames[body][:10])
 
 print("\n output of 10 rows of timestep sizes")
-timestep_path = path / "loopendedtriangles_timestep_sizes.csv"
+timestep_path = path / "loopendedtriangleslowermax_timestep_sizes.csv"
 with open(timestep_path, "r") as f:
     for i, line in enumerate(f):
         if i >= 10:

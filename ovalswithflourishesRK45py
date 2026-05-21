@@ -5,7 +5,7 @@ from scipy.integrate import RK45
 
 # initial conditions from http://three-body.ipb.ac.rs/sheen_sol.php?id=0
 figure8 = [(2.57429,0.0,0.0),1,(0.216343,0.332029,0.0),(-2.57429,0.0,0.0),1,(0.216343,0.332029,0),(0,0,0),1,(-0.432686,-0.664058,0)]
-ovalswithflourishes = [(0.716248295713,0.384288553041,0.0),1,(1.245268230896,2.444311951777,0.0),(0.086172594591,1.342795868577,0.0),1,(-0.67522432369,-0.96287961363,0.0),(0.538777980808,0.481049882656,0.0),1,(-0.570043907206,-1.481432338147,0.0)]
+ovalswithflourisheslowermax = [(0.716248295713,0.384288553041,0.0),1,(1.245268230896,2.444311951777,0.0),(0.086172594591,1.342795868577,0.0),1,(-0.67522432369,-0.96287961363,0.0),(0.538777980808,0.481049882656,0.0),1,(-0.570043907206,-1.481432338147,0.0)]
 
 NUM_BODIES = 3
 
@@ -117,9 +117,9 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
         fun=lambda t, y: ode_system(t, y, MASS, NUM_BODIES),
         t0=t0,
         y0=f0,
-        t_bound=np.inf,
-        rtol=1e-9,
-        atol=1e-12,
+        t_bound=1000, # np.inf
+        rtol=3.162e-12, #1e-10 was ok i think
+        atol=1e-12, #1e-12
         max_step=np.inf # adaptive timestep
     )
 
@@ -127,7 +127,7 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
     times = []
     step_count = 0
 
-    COLLISION_THRESHOLD = 0.001   # bodies too close
+    COLLISION_THRESHOLD = 0.0001   # bodies too close
     ESCAPE_THRESHOLD = 50.0     # bodies too far apart
 
     while solver.status == 'running':
@@ -211,26 +211,26 @@ def read_phase_space(NUM_BODIES, path, run_name):
     
     return phase_space_data
 
-print(f"ovalswithflourishes")
+print(f"ovalswithflourishes lower max")
 start = time.time()
 # 1 simulation time unit is like 200 internal steps with dt=0.005
-frames, timesteps = Simulate(ovalswithflourishes, 0.005, "ovalswithflourishes")
+frames, timesteps = Simulate(ovalswithflourisheslowermax, 0.005, "ovalswithflourisheslowermax")
 end = time.time()
 
 #path = Path.cwd() / "Simulated_Data"
 path = Path(r"C:\Users\kaisa\My Drive\Simulated_Data")
 
-sim_data = read_phase_space(NUM_BODIES, path, "ovalswithflourishes")
+sim_data = read_phase_space(NUM_BODIES, path, "ovalswithflourisheslowermax")
 print(f"Simulation computations lasted {end - start:.2f} s")
 print(f"Total timesteps: {len(timesteps)}")
 
 print("\n output of 10 rows for each body")
 for body in range(NUM_BODIES):
-    print(f"\novalswithflourishes_Body {body}:")
+    print(f"\novalswithflourisheslowermax_Body {body}:")
     print(frames[body][:10])
 
 print("\n output of 10 rows of timestep sizes")
-timestep_path = path / "ovalswithflourishes_timestep_sizes.csv"
+timestep_path = path / "ovalswithflourisheslowermax_timestep_sizes.csv"
 with open(timestep_path, "r") as f:
     for i, line in enumerate(f):
         if i >= 10:
