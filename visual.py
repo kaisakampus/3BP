@@ -1,556 +1,218 @@
 import matplotlib
-from mpl_toolkits.mplot3d.art3d import Line3DCollection
-from matplotlib import colors as mcolors
-matplotlib.use("tkagg")
+matplotlib.use('TkAgg')
+
+import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-from matplotlib.animation import FuncAnimation
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.animation import FuncAnimation, FFMpegWriter
+from matplotlib.widgets import Button
+from matplotlib.lines import Line2D
+import time
 
-'''def calculate_trajectory_error(reference_data, simulated_data, frame_idx):
-    ref_vec = []
-    sim_vec = []
-    
-    for ref_body, sim_body in zip(reference_data, simulated_data):
-        if frame_idx < len(ref_body) and frame_idx < len(sim_body):
-            ref_vec.extend(ref_body[frame_idx])
-            sim_vec.extend(sim_body[frame_idx])
-    
-    ref_vec = np.array(ref_vec)
-    sim_vec = np.array(sim_vec)
-    
-    ref_norm = np.linalg.norm(ref_vec)
-    if ref_norm == 0:
-        return float('inf')
-    
-    diff_norm = np.linalg.norm(ref_vec - sim_vec)
-    return (diff_norm / ref_norm) * 100.0'''
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\loopendedtriangleslowermax"
+body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
+body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
+body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
 
-'''def error_function(reference_data, simulated_data, masses):
-    initial_state = [body_data[0] for body_data in simulated_data]
-    initial_H = calculate_hamiltonian(initial_state, masses)
-    
-    def error_at_time(t):
-        frame_idx = int(t)
-        traj_error = calculate_trajectory_error(reference_data, simulated_data, frame_idx)
-        ham_error = calculate_hamiltonian_error(simulated_data, masses, initial_H, frame_idx)
-        return traj_error, ham_error
-    
-    return error_at_time
+TRAIL = 80
+N_SEG = 30
 
+fig = plt.figure(figsize=(11, 9))
+ax  = fig.add_subplot(111, projection='3d')
+fig.subplots_adjust(bottom=0.15)
 
-def calculate_max_error(errors, dt=1.0):
-    errors_array = np.array(errors)
-    finite_errors = errors_array[np.isfinite(errors_array)]
-    
-    if len(finite_errors) == 0:
-        return float('inf')
-    
-    return finite_errors.max()'''
+all_x = np.concatenate([body0[:, 0], body1[:, 0], body2[:, 0]])
+all_y = np.concatenate([body0[:, 1], body1[:, 1], body2[:, 1]])
+xpad  = (all_x.max() - all_x.min()) * 0.1
+ypad  = (all_y.max() - all_y.min()) * 0.1
 
-'''def calculate_totE(phase_space_data, masses, G=1.0, softening=SOFTENING): # Uses Plummer softening: phi = -Gm/sqrt(r^2 + eps^2)
-    num_bodies = len(phase_space_data)
-    
-    # Kinetic energy: T = (1/2) * sum m_i * v_i^2
-    T = 0.0
-    for i in range(num_bodies):
-        pos_vel = phase_space_data[i]
-        vx, vy, vz = pos_vel[3], pos_vel[4], pos_vel[5]
-        v_squared = vx**2 + vy**2 + vz**2
-        T += 0.5 * masses[i] * v_squared
-    
-    # Potential energy with softening
-    V = 0.0
-    eps2 = softening * softening
-    for i in range(num_bodies):
-        for j in range(i + 1, num_bodies):
-            xi, yi, zi = phase_space_data[i][0], phase_space_data[i][1], phase_space_data[i][2]
-            xj, yj, zj = phase_space_data[j][0], phase_space_data[j][1], phase_space_data[j][2]
-            
-            dx = xj - xi
-            dy = yj - yi
-            dz = zj - zi
-            
-            r_soft = np.sqrt(dx**2 + dy**2 + dz**2 + eps2)
-            V -= G * masses[i] * masses[j] / r_soft
-    
-    return T + V
+ax.set_xlim(all_x.min() - xpad, all_x.max() + xpad)
+ax.set_ylim(all_y.min() - ypad, all_y.max() + ypad)
+ax.set_zlim(-1, 1)
+ax.set_xlabel("x [–]")
+ax.set_ylabel("y [–]")
+ax.set_zlabel("z [–]")
+ax.set_title("loopended triangles in 3D simulation")
+ax.view_init(elev=25, azim=45)
 
-def calculate_totE_error(simulated_data, masses, initial_H, frame_idx, G=1.0, softening=SOFTENING):
-    current_state = []
-    for body_data in simulated_data:
-        if frame_idx < len(body_data):
-            current_state.append(body_data[frame_idx])
-        else:
-            return float('inf')
-    
-    H_current = calculate_totE(current_state, masses, G, softening)
-    delta_H = abs(H_current - initial_H)
-    
-    if abs(initial_H) < 1e-10:
-        return float('inf')
-    
-    return (delta_H / abs(initial_H)) * 100.0'''
+N = min(len(body0), len(body1), len(body2))
 
-    # make sure that body.csv has been created for simulation data
-    # visualisation of 3 body configuration simulation
-    # stepsize vs time plot
-    # original vs perturbation trajectory accuracy plot
-    # energy fluctuations: When comparing perturbations, plot delta E relative to the original system
+info_text = fig.text(0.76, 0.88,
+                     "step:  0 / {}\nT    = 0.00s\nspeed = 3".format(N),
+                     fontsize=11, ha='left', va='top', family='monospace',
+                     bbox=dict(boxstyle='round,pad=0.5', facecolor='white',
+                               edgecolor='gray', alpha=0.8))
 
-# GUI theme
-customtkinter.set_appearance_mode("System")
-customtkinter.set_default_color_theme("green")
-print(" \nCreating The Window\n")
+# fading trail segments
+trail_segs0 = [ax.plot([], [], [], color="turquoise",     lw=1, alpha=(i+1)/N_SEG)[0] for i in range(N_SEG)]
+trail_segs1 = [ax.plot([], [], [], color="deeppink", lw=1, alpha=(i+1)/N_SEG)[0] for i in range(N_SEG)]
+trail_segs2 = [ax.plot([], [], [], color="lime",    lw=1, alpha=(i+1)/N_SEG)[0] for i in range(N_SEG)]
 
-class app(customtkinter.CTk):
-    def __init__(self): # app self initiation process
-        customtkinter.CTk.__init__(self)
-        self.anim = None # lets animation run
-        self.current_fig = None # lets plots appear in the window
-        self.last_simulation_data = None  # stores last simulation info
+# animated dots
+dot0, = ax.plot([], [], [], 'o', color="deepskyblue",  ms=4, zorder=6)
+dot1, = ax.plot([], [], [], 'o', color="red",        ms=4, zorder=6)
+dot2, = ax.plot([], [], [], 'o', color="lightgreen",  ms=4, zorder=6)
 
-        def on_closing(): # protocol to stop animation
-            if self.anim is not None:
-                self.anim.event_source.stop() #stops matplotlib plots from running in loop
+# legend
+legend_elements = [
+    Line2D([0], [0], color='turquoise',     lw=1.5, label='body 0'),
+    Line2D([0], [0], color='deeppink', lw=1.5, label='body 1'),
+    Line2D([0], [0], color='lime',    lw=1.5, label='body 2'),
+]
+ax.legend(handles=legend_elements, loc="upper left", fontsize=9)
 
-            if self.current_fig is not None:
-                plt.close(self.current_fig) # closing matplotlib figures
+# state
+state          = {"frame": 0, "paused": False, "step": 3}
+sim_start_time = None
+pause_start    = None
+total_paused   = 0.0
 
-            plt.close('all')  # close any remaining figures
+def update(frame):
+    global sim_start_time, pause_start, total_paused
 
-            # closing the window
-            print("\nClosing The Window\n")
-            self.quit()
-            self.destroy()
+    if state["paused"]:
+        return []
 
-        # protocol for closing the app
-        self.protocol("WM_DELETE_WINDOW", on_closing)
+    if sim_start_time is None:
+        sim_start_time = time.time()
 
-        def get_path(body):
-            if body == -1:
-                path = Path(str(CWDDIR)) / "Simulated_Data"  # directory to body file(s)
+    f       = state["frame"]
+    start   = max(0, f - TRAIL)
+    seg_len = max(1, (f - start) // N_SEG)
+    elapsed = time.time() - sim_start_time - total_paused
+
+    for segs, dot, body in [
+        (trail_segs0, dot0, body0),
+        (trail_segs1, dot1, body1),
+        (trail_segs2, dot2, body2),
+    ]:
+        for i, seg in enumerate(segs):
+            s = start + i * seg_len
+            e = start + (i + 1) * seg_len + 1
+            if s >= f:
+                seg.set_data([], [])
+                seg.set_3d_properties([])
             else:
-                path = Path(str(CWDDIR)) / "Simulated_Data" / f"body{body}.csv"  # individual csv for each body
-            return path
+                seg.set_data(body[s:e, 0], body[s:e, 1])
+                seg.set_3d_properties(body[s:e, 2])
 
-# simulation plot function
-        def show_animation(duration):
-            # CONSTANTS
-            NUM_BODIES = len([f for f in os.listdir(get_path(-1)) if f.startswith('body') and f.endswith('.csv')])
-            TRAIL = 200
-            # length of timeline
-            # TIMESTEP = 0.001 to 0.1
-            with open(get_path(0), encoding="utf-8") as f:
-                row_count = sum(1 for _ in f)
+        dot.set_data([body[f, 0]], [body[f, 1]])
+        dot.set_3d_properties([body[f, 2]])
 
-            TIMELINE = np.linspace(0, row_count, row_count)
-            # read body positions for every frame from seperate csv files, one for each body
-            frames = np.empty((NUM_BODIES, TIMELINE.size, 3), dtype=float)
-            for body in range(0, NUM_BODIES):
-                path = get_path(body)
-                frames[body] = np.genfromtxt(path, delimiter=',')[:, :3]
+    info_text.set_text("step: {:>6} / {}\nT    = {:.2f}s\nspeed = {}".format(
+        f, N, elapsed, state["step"]))
 
-            # plotting the data
-            fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    state["frame"] = (f + state["step"]) % N
+    return []
 
-            # showing time in animation
-            plottime = 0
-            timetext = ax.text2D(-0.30, 0.955, " t=" + str(plottime), transform=ax.transAxes, fontsize=24,
-                                 color='black')
+def on_scroll(event):
+    scale = 0.9 if event.button == 'up' else 1.1
+    xlim = ax.get_xlim3d()
+    ylim = ax.get_ylim3d()
+    zlim = ax.get_zlim3d()
+    cx = (xlim[0] + xlim[1]) / 2
+    cy = (ylim[0] + ylim[1]) / 2
+    cz = (zlim[0] + zlim[1]) / 2
+    ax.set_xlim3d([cx + (x - cx) * scale for x in xlim])
+    ax.set_ylim3d([cy + (y - cy) * scale for y in ylim])
+    ax.set_zlim3d([cz + (z - cz) * scale for z in zlim])
+    fig.canvas.draw_idle()
 
-            # animation of trails & points (The fading trail was coded using ChatGPT)
-            trail_cols = []
-            trail_rgbs = []
-            points = []
+fig.canvas.mpl_connect('scroll_event', on_scroll)
 
-            for body in range(len(frames)):
-                # make one fading trail collection per body
-                lc = Line3DCollection([], linewidths=2)
-                ax.add_collection3d(lc, autolim=False)
-                trail_cols.append(lc)
+# buttons
+#ax_slower  = fig.add_axes([0.11, 0.04, 0.12, 0.05])
+#ax_faster  = fig.add_axes([0.25, 0.04, 0.12, 0.05])
+ax_pause   = fig.add_axes([0.39, 0.04, 0.12, 0.05])
+ax_restart = fig.add_axes([0.53, 0.04, 0.12, 0.05])
+ax_save    = fig.add_axes([0.67, 0.04, 0.12, 0.05])
+#ax_quit    = fig.add_axes([0.81, 0.04, 0.12, 0.05])
 
-                # store a per-body base color (use default cycle)
-                base_color = ax._get_lines.get_next_color()
-                trail_rgbs.append(mcolors.to_rgb(base_color))
+#btn_slower  = Button(ax_slower,  "Slow")
+#btn_faster  = Button(ax_faster,  "Fast")
+btn_pause   = Button(ax_pause,   "Pause")
+btn_restart = Button(ax_restart, "Restart")
+btn_save    = Button(ax_save,    "Save")
+#btn_quit    = Button(ax_quit,    "Quit")
 
-                # head point (same color as trail)
-                points.append(ax.plot([], [], [], 'o', markersize=4, color='red')[0])
+def on_slower(event):
+    state["step"] = max(1, state["step"] - 5)
+    fig.canvas.draw_idle()
 
-            def update_data(frame):
-                # go through every E.O.M frame by frame (motion has already been calculated)
-                for body in range(len(frames)):
-                    start = max(0, frame - TRAIL)
-                    xyz = frames[body, start:frame + 1, :]  # (k,3)
+def on_faster(event):
+    state["step"] = min(20, state["step"] + 1)
+    fig.canvas.draw_idle()
 
-                    if xyz.shape[0] < 2:
-                        trail_cols[body].set_segments([])
-                    else:
-                        # segments: (k-1, 2, 3)
-                        segs = np.stack([xyz[:-1], xyz[1:]], axis=1)
-                        trail_cols[body].set_segments(segs)
+def on_pause(event):
+    global pause_start, total_paused
+    state["paused"] = not state["paused"]
+    if state["paused"]:
+        pause_start = time.time()
+        btn_pause.label.set_text("Resume")
+    else:
+        if pause_start is not None:
+            total_paused += time.time() - pause_start
+        btn_pause.label.set_text("Pause")
+    fig.canvas.draw_idle()
 
-                        nseg = segs.shape[0]
-                        # alpha from old -> new (0 -> 1)
-                        alphas = np.linspace(0.0, 1.0, nseg) ** (3 / 2)
+def on_restart(event):
+    global sim_start_time, pause_start, total_paused
+    state["frame"]  = 0
+    state["paused"] = False
+    state["step"]   = 3
+    sim_start_time  = None
+    pause_start     = None
+    total_paused    = 0.0
+    btn_pause.label.set_text("Pause")
+    fig.canvas.draw_idle()
 
-                        r, g, b = trail_rgbs[body]
-                        rgba = np.column_stack([np.full(nseg, r), np.full(nseg, g), np.full(nseg, b), alphas])
-                        trail_cols[body].set_color(rgba)
+def on_save(event):
+    global pause_start, total_paused
+    state["paused"] = True
+    pause_start     = time.time()
+    btn_pause.label.set_text("Resume")
+    btn_save.label.set_text("Saving...")
+    fig.canvas.draw_idle()
 
-                    # head point
-                    points[body].set_data([frames[body, frame, 0]], [frames[body, frame, 1]])
-                    points[body].set_3d_properties([frames[body, frame, 2]])
-
-                # getting time passed per frame within simulation
-                plottime = float("%.2f" % (frame / 24))
-                timetext.set_text("t=" + str(plottime))
-                return trail_cols, points, timetext
-
-            axis_dim = 10
-            ax.set_xlim(-axis_dim, axis_dim)
-            ax.set_ylim(-axis_dim, axis_dim)
-            ax.set_zlim(-axis_dim, axis_dim)
-
-            ax.set_xlabel('X axis')
-            ax.set_ylabel('Y axis')
-            ax.set_zlabel('Z axis')
-
-            self.anim = FuncAnimation(fig, update_data, frames=TIMELINE.size, interval=10, blit=False)
-            #self.anim.save((Path(str(CWDDIR)) / "Statistics" / (str(self.dropdown1.get())+'animation.mp4')), writer='ffmpeg', fps=24)
-
-            # destroy the old animation if ran multiple times
-            for widget in self.animation_frame.winfo_children():
-                widget.destroy()
-
-            canvas = FigureCanvasTkAgg(fig, self.animation_frame)
-            canvas_widget = canvas.get_tk_widget()
-            canvas_widget.pack(fill="both", expand=True)
-
-            canvas.draw()
-
-# SUS
-        def show_statistics(duration, precision, selection):
-            # constants
-            NUM_BODIES = len([f for f in os.listdir(get_path(-1)) if f.startswith('body') and f.endswith('.csv')])
-
-            # opening reference data and simulation data
-            path_reference = Path(str(CWDDIR)) / 'Reference_Data' / (
-                        (str(selection).split(' - ')[1]) + "_IAS15_dT_" + "0.0005")
-            path_simulation = get_path(-1)
-
-            # Check if reference data exists
-            if not path_reference.exists():
-                print("\n" + "#" * 60)
-                print("ERROR: Reference data not found!")
-                print("#" * 60)
-                print(f"\nMissing: {path_reference}")
-                print("\nPlease run the reference simulation first before")
-                print("comparing results. Select IAS15 as the integrator and")
-                print("run a simulation with precision 0.0005 to generate reference data.")
-                return
-
-            # Read phase space data
-            reference_data = data_analysis.read_phase_space(NUM_BODIES, path_reference)
-            simulated_data = data_analysis.read_phase_space(NUM_BODIES, path_simulation)
-
-            # Extract masses from configuration
-            if selection.startswith('S'):
-                num = int(selection.split('-')[0].strip().split(' ')[1]) - 1
-                masses = [initialconditions[num][1], initialconditions[num][4], initialconditions[num][7]]
-            else:
-                num = int(selection.split('-')[0].strip().split(' ')[1]) - 1
-                masses = [customs[num][1], customs[num][4], customs[num][7]]
-
-            # Create error function
-            error_func = data_analysis.error_function(reference_data, simulated_data, masses)
-
-            # count frames - use minimum length between reference and simulation
-            min_frames = min(len(simulated_data[0]), len(reference_data[0]))
-
-            # timeline: 1 time unit = 24 frames
-            frames = np.arange(min_frames)
-            TIMELINE = frames / 24
-
-            # Calculate errors at each time point
-            trajectory_errors = []
-            totE_errors = []
-
-            for frame in frames:
-                traj_err, E_err = error_func(frame)
-                trajectory_errors.append(traj_err)
-                totE_errors.append(E_err)
-
-            # Calculate max errors
-            traj_max = data_analysis.calculate_max_error(trajectory_errors, dt=1.0 / 24.0)
-            E_max = data_analysis.calculate_max_error(totE_errors, dt=1.0 / 24.0)
-
-            # Create plot with two subplots
-            fig2, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
-
-            n = len(trajectory_errors)
-
-            # Trajectory Error Plot
-            ax1.plot(TIMELINE[1:n], trajectory_errors[1:n], linewidth=2, color='red', label='Trajectory Error')
-            ax1.axhline(y=traj_max, color='darkred', linestyle='--', linewidth=1.5,
-                        label=f'%_MAX = {traj_max:.2e}%')
-            ax1.set_xlabel('Time', fontsize=11)
-            ax1.set_ylabel('Trajectory Error E_% (%)', fontsize=11)
-            ax1.set_title('Phase Space Trajectory Error vs Time', fontsize=12, fontweight='bold')
-            ax1.grid(True, alpha=0.3, which='both')
-            ax1.legend(loc='upper right')
-
-            # Energy Error Plot
-            ax2.plot(TIMELINE, totE_errors, linewidth=2, color='blue', label='Total Energy Error')
-            ax2.axhline(y=E_max, color='darkblue', linestyle='--', linewidth=1.5,
-                        label=f'E_MAX = {ham_max:.2e}%')
-            ax2.set_xlabel('Time', fontsize=11)
-            ax2.set_ylabel('Total Energy Error E_H% (%)', fontsize=11)
-            ax2.set_title('Energy Conservation Error vs Time', fontsize=12, fontweight='bold')
-            ax2.grid(True, alpha=0.3, which='both')
-            ax2.legend(loc='upper right')
-
-            plt.tight_layout()
-            dt_str = f"{precision:g}".replace(".", "p")  # 0.065 -> "0p065"
-            out = Path(str(CWDDIR)) / "Statistics" / f"{self.dropdown1.get()}_Simulated_data_dT_{dt_str}.png"
-            out.parent.mkdir(parents=True, exist_ok=True)
-            plt.savefig(out, dpi=300, bbox_inches="tight")
-
-            # Destroy old statistics plot if it exists
-            for widget in self.statistics_frame.winfo_children():
-                widget.destroy()
-
-            # Embed in GUI
-            canvas2 = FigureCanvasTkAgg(fig2, self.statistics_frame)
-            canvas_widget2 = canvas2.get_tk_widget()
-            canvas_widget2.pack(fill="both", expand=True)
-            canvas2.draw()
-
-            # Print summary statistics to console
-            print("\n" + "#" * 60)
-            print(f"ERROR ANALYSIS: ")
-            print("#" * 60 + "\n")
-            print(f"Total frames analyzed: {min_frames}")
-            print(f"Max Trajectory Error: {traj_max:.4e}%")
-            print(f"Max Total Energy Error: {ham_max:.4e}%\n")
-
-            # Create visualization
-            fig3 = plt.figure(figsize=(12, 10))
-
-def update():
-    submission_time = datetime.datetime.now()
-
-    try:
-        selection = self.dropdown1.get()
-        duration = int(self.durationVariable.get())
-
-        # --- precision ---
-        if self.var2.get() == 0:
-            precision = round(self.precision.get(), 4)
-        else:
-            precision = float(self.precisionoverride.get())
-
-        # --- get config index ---
-        num = int(selection.split('-')[0].split()[1]) - 1
-
-        # --- get data ---
-        if self.var1.get() == 1:
-            # manual input mode
-            try:
-                data = [
-                    ast.literal_eval(self.position1.get()), float(self.mass1.get()), ast.literal_eval(self.velocity1.get()),
-                    ast.literal_eval(self.position2.get()), float(self.mass2.get()), ast.literal_eval(self.velocity2.get()),
-                    ast.literal_eval(self.position3.get()), float(self.mass3.get()), ast.literal_eval(self.velocity3.get())
-                ]
-            except Exception:
-                show_error("Invalid input format. Use (x, y, z) for vectors.")
-                return
-        else:
-            # preset from CSV
-            data = configs[num]
-
-        # --- extract masses ---
-        masses = [data[1], data[4], data[7]]
-
-        print(f"\nRunning RK45 simulation")
-        print(f"Precision: {precision}")
-        print(f"Duration: {duration}\n")
-
-        # --- run simulation ---
-        Simulate(data, precision, duration)
-
-        # --- visualization ---
-        show_animation(duration)
-        show_statistics(duration, precision, selection)
-
-        # --- timing ---
-        elapsed = datetime.datetime.now() - submission_time
-        print(f"Processing time: {elapsed}\n")
-
-        # --- store last run ---
-        self.last_simulation_data = {
-            'num_bodies': 3,
-            'masses': masses,
-            'precision': precision,
-            'duration': duration,
-            'selection': selection
-        }
-
-    except Exception as e:
-        show_error(e)
-
-                rendering_time = datetime.datetime.now()
-                time_elapsed = rendering_time - submission_time
-                print("Processing time of simulation: " + str(time_elapsed) + "\n")
-
-                # Store simulation data for Lyapunov analysis
-                NUM_BODIES = 3
-                self.last_simulation_data = {
-                    'num_bodies': NUM_BODIES,
-                    'masses': masses,
-                    'precision': precision,
-                    'duration': int(self.durationVariable.get()),
-                    'selection': selection
-                }
-
-                show_statistics(int(self.durationVariable.get()), precision, selection)
-            except Exception as e:
-                show_error(e)
-
-        def override():
-            if self.var2.get() == 1:
-                self.precisionoverride.configure(state="normal")
-            else:
-                self.precisionoverride.configure(state="disabled")
-
-        def save():
-            if self.var1.get() != 1:
-                return
-
-            def submit():
-                new = list((ast.literal_eval(self.position1.get()), eval(self.mass1.get()), eval(self.velocity1.get()),
-                            eval(self.position2.get()), eval(self.mass2.get()), eval(self.velocity2.get()),
-                            eval(self.position3.get()), eval(self.mass3.get()), eval(self.velocity3.get()),
-                            self.popup.name.get().split('- ')[-1]))
-                if self.popup.new_save.get():
-                    presets = open("data_list.csv", "a")
-                    customs.append(new)
-                    presets.write(str(new) + '\n')
-
-                    full.append(f'Custom {len(full) - len(initialconditions) + 1} - {new[-1]}')
-                    self.dropdown1.set(full[-1])
-                    presets.close()
+    def save_update(f):
+        start   = max(0, f - TRAIL)
+        seg_len = max(1, (f - start) // N_SEG)
+        for segs, dot, body in [
+            (trail_segs0, dot0, body0),
+            (trail_segs1, dot1, body1),
+            (trail_segs2, dot2, body2),
+        ]:
+            for i, seg in enumerate(segs):
+                s = start + i * seg_len
+                e = start + (i + 1) * seg_len + 1
+                if s >= f:
+                    seg.set_data([], [])
+                    seg.set_3d_properties([])
                 else:
-                    if self.dropdown1.get().startswith("S"):
-                        print("Can not edit stable orbits")
-                        return
-                    index = int(self.dropdown1.get().split('-')[0].strip().split(' ')[1]) - 1
-                    customs[index] = new
-                    presets = open("data_list.csv", "w")
-                    presets.write('\n')
-                    for i in customs:
-                        presets.write(str(i) + '\n')
+                    seg.set_data(body[s:e, 0], body[s:e, 1])
+                    seg.set_3d_properties(body[s:e, 2])
+            dot.set_data([body[f, 0]], [body[f, 1]])
+            dot.set_3d_properties([body[f, 2]])
+        info_text.set_text("step: {:>6} / {}\nT    = saving...\nspeed = {}".format(
+            f, N, state["step"]))
 
-                    full[len(initialconditions) + index] = f'Custom {index + 1} - {new[-1]}'
-                    self.dropdown1.set(full[len(initialconditions) + index])
+    save_ani = FuncAnimation(fig, save_update, frames=range(0, N, state["step"]), blit=False)
+    writer   = FFMpegWriter(fps=30, bitrate=1800)
+    outpath  = base + "_simulation.mp4"
+    save_ani.save(outpath, writer=writer)
+    btn_save.label.set_text("Saved!")
+    fig.canvas.draw_idle()
 
-                self.dropdown1.configure(values=full)
+def on_quit(event):
+    plt.close(fig)
 
-                self.popup.destroy()
-                self.popup.update()
-                return
+#btn_slower.on_clicked(on_slower)
+#btn_faster.on_clicked(on_faster)
+btn_pause.on_clicked(on_pause)
+btn_restart.on_clicked(on_restart)
+btn_save.on_clicked(on_save)
+#btn_quit.on_clicked(on_quit)
 
-            self.popup = customtkinter.CTkToplevel(self)
-            self.popup.title("Name Config")
-            self.popup.geometry("400x200")
-            self.popup.resizable(False, False)
-            self.popup.attributes("-topmost", True)
+ani = FuncAnimation(fig, update, frames=N, interval=400, blit=False, repeat=True)
 
-            self.popup.grid_columnconfigure(1, weight=1)
-            self.popup.grid_rowconfigure(1, weight=1)
-
-            self.popup.frame = customtkinter.CTkFrame(self.popup)
-            self.popup.frame.grid(row=1, column=1, rowspan=2, columnspan=2, pady=0, padx=0, sticky="nsew")
-            self.popup.new_save = customtkinter.CTkCheckBox(self.popup.frame, text="New Save", onvalue=1, offvalue=0,
-                                                            command=check)
-            self.popup.new_save.pack(side="left", padx=(40, 5), pady=5)
-            self.popup.name = customtkinter.CTkEntry(self.popup.frame, placeholder_text="Save Name")
-            self.popup.name.insert(0, self.dropdown1.get())
-            self.popup.name.configure(state="disabled")
-            self.popup.name.pack(side="right", padx=(5, 40), pady=5)
-
-            self.popup.submit = customtkinter.CTkButton(self.popup.frame, text="Submit", command=submit)
-            self.popup.submit.pack(side="bottom", padx=5, pady=(5, 20))
-
-        def check():
-            if self.popup.new_save.get():
-                self.popup.name.configure(state="normal")
-
-                self.popup.name.delete(0, "end")
-            else:
-                self.popup.name.delete(0, "end")
-                self.popup.name.insert(0, self.dropdown1.get())
-                self.popup.name.configure(state="disabled")
-
-        # lists of configurations
-        initialconditions = list()
-        full = list()
-
-        with open("data_list.csv", "r") as presets:
-            for x in presets:
-                line = x.strip()
-                if line:
-                    initialconditions.append(ast.literal_eval(line))
-
-        for i, stable in enumerate(initialconditions):
-            full.append(f'Stable {i + 1} - {stable[-1]}')
-
-        # Window configuration
-        self.title("Three Body Problem Simulator")
-        self.geometry("1400x1000")
-
-        # configure grid layout (4x4)
-        self.grid_columnconfigure((1), weight=1)
-        self.grid_columnconfigure((2, 3), weight=0)
-        self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure((1, 2, 3), weight=1)
-
-        # Submit button and hidden textfield for error popups
-        self.submitframe = customtkinter.CTkFrame(self)
-        self.submitframe.grid(column=2, row=3, pady=(0, 20), padx=20, sticky="nsew")
-        self.save = customtkinter.CTkButton(self.submitframe, height=20, width=150, text="Save Configuration",
-                                            command=save)
-        self.save.pack(pady=(5, 5), side="top")
-        self.slidertext = customtkinter.CTkLabel(self.submitframe, height=20, width=300, text="")
-        self.slidertext.pack(pady=(20, 5), side="top")
-        self.precision = customtkinter.CTkSlider(self.submitframe, from_=0.1, to=0.0005, width=200,
-                                                 command=lambda value: self.slidertext.configure(
-                                                     text="Precision: " + str(round(value,
-                                                                                    4)) + " (size of timesteps, lower is more accurate)"),
-                                                 number_of_steps=100)
-        self.precision.pack(pady=(5, 20), padx=20, side="top")
-        self.precision.set(0.01)
-        self.slidertext.configure(
-            text="Precision: " + str(round(self.precision.get(), 4)) + " (size of timesteps, lower is more accurate)")
-        self.durationVariable = customtkinter.CTkEntry(self.submitframe, width=200,
-                                                       placeholder_text="Simulation duration (s)")
-        self.durationVariable.pack(pady=10, padx=20, side="top")
-        self.submit = customtkinter.CTkButton(self.submitframe, text="Simulate", command=update)
-        self.submit.pack(pady=10, padx=20, side="top")
-        self.textfield = customtkinter.CTkLabel(self.submitframe, height=20, width=300, text="")
-        self.textfield.pack(pady=10, side="top")
-        self.var2 = IntVar()
-
-        # frame for simulation animation
-        self.animation_frame = customtkinter.CTkFrame(self.simtabs.tab("Simulation"), height=500)
-        self.animation_frame.grid(column=0, row=0, rowspan=2, columnspan=2, padx=20, pady=20, sticky="nsew")
-
-        # frame for statistics plot
-        self.statistics_frame = customtkinter.CTkFrame(self.simtabs.tab("Simulation"), height=300)
-        self.statistics_frame.grid(column=0, row=2, rowspan=2, columnspan=2, padx=20, pady=(0, 20), sticky="nsew")
-
-        integrator("rk45")
-        stableOrbits("Stable 1 - Equilateral Triangle")
-
-
-app().mainloop()
+plt.show(block=True)

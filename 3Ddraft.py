@@ -33,22 +33,11 @@ ax.set_zlabel("z [–]")
 ax.set_title("loopended triangles — 3D simulation")
 ax.view_init(elev=25, azim=45)
 
-# timestep counter — upper right inside the figure
 N = min(len(body0), len(body1), len(body2))
 step_text = fig.text(0.78, 0.88, "step: 0 / {}".format(N),
                      fontsize=11, ha='left', va='top',
                      bbox=dict(boxstyle='round,pad=0.4', facecolor='white',
                                edgecolor='gray', alpha=0.8))
-
-# faint ghost of full orbit
-ax.plot(body0[:, 0], body0[:, 1], body0[:, 2], color="blue",     lw=0.4, alpha=0.2)
-ax.plot(body1[:, 0], body1[:, 1], body1[:, 2], color="deeppink", lw=0.4, alpha=0.2)
-ax.plot(body2[:, 0], body2[:, 1], body2[:, 2], color="green",    lw=0.4, alpha=0.2)
-
-# starting position markers
-ax.scatter(body0[0, 0], body0[0, 1], body0[0, 2], color="darkblue",  s=60, marker='^', label="start 0")
-ax.scatter(body1[0, 0], body1[0, 1], body1[0, 2], color="red",        s=60, marker='^', label="start 1")
-ax.scatter(body2[0, 0], body2[0, 1], body2[0, 2], color="darkgreen",  s=60, marker='^', label="start 2")
 
 # animated trails
 trail0, = ax.plot([], [], [], color="blue",     lw=1.5, label="body 0")
@@ -82,11 +71,9 @@ def update(frame):
         dot.set_3d_properties([body[f, 2]])
 
     step_text.set_text("step: {} / {}".format(f, N))
-
     state["frame"] = (f + STEP) % N
     return trail0, trail1, trail2, dot0, dot1, dot2
 
-# --- zoom with scroll wheel ---
 def on_scroll(event):
     scale = 0.9 if event.button == 'up' else 1.1
     xlim = ax.get_xlim3d()
@@ -102,7 +89,7 @@ def on_scroll(event):
 
 fig.canvas.mpl_connect('scroll_event', on_scroll)
 
-# --- buttons ---
+# buttons
 ax_pause   = fig.add_axes([0.25, 0.04, 0.12, 0.05])
 ax_restart = fig.add_axes([0.39, 0.04, 0.12, 0.05])
 ax_save    = fig.add_axes([0.53, 0.04, 0.12, 0.05])
@@ -125,13 +112,39 @@ def on_restart(event):
     fig.canvas.draw_idle()
 
 def on_save(event):
-    # pause while saving so the live animation doesn't fight the writer
     state["paused"] = True
     btn_pause.label.set_text("Resume")
     btn_save.label.set_text("Saving...")
     fig.canvas.draw_idle()
 
-    save_state = {"frame": 0}
-
     def save_update(f):
         start = max(0, f - TRAIL)
+        for trail, dot, body in [
+            (trail0, dot0, body0),
+            (trail1, dot1, body1),
+            (trail2, dot2, body2),
+        ]:
+            trail.set_data(body[start:f, 0], body[start:f, 1])
+            trail.set_3d_properties(body[start:f, 2])
+            dot.set_data([body[f, 0]], [body[f, 1]])
+            dot.set_3d_properties([body[f, 2]])
+        step_text.set_text("step: {} / {}".format(f, N))
+
+    save_ani = FuncAnimation(fig, save_update, frames=range(0, N, STEP), blit=False)
+    writer   = FFMpegWriter(fps=30, bitrate=1800)
+    outpath  = base + "_simulation.mp4"
+    save_ani.save(outpath, writer=writer)
+    btn_save.label.set_text("Saved!")
+    fig.canvas.draw_idle()
+
+def on_quit(event):
+    plt.close(fig)
+
+btn_pause.on_clicked(on_pause)
+btn_restart.on_clicked(on_restart)
+btn_save.on_clicked(on_save)
+btn_quit.on_clicked(on_quit)
+
+ani = FuncAnimation(fig, update, frames=N, interval=10, blit=False, repeat=True)
+
+plt.show(block=True)
