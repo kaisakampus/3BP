@@ -9,7 +9,7 @@ from matplotlib.widgets import Button
 from matplotlib.lines import Line2D
 import time
 
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\figure8add"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\ovalswithflourisheslowermax"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
