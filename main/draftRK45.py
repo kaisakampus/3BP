@@ -4,9 +4,11 @@ import time
 from pathlib import Path
 from scipy.integrate import RK45
 
-# initial conditions https://observablehq.com/@rreusser/periodic-planar-three-body-orbits#group=%C5%A0uvakov&sequence=Sheen&orbit=Loop-ended-triangles
-figure8 = [(2.57429,0,0),1,(0.216343,0.332029,0),(-2.57429,0,0),1,(0.216343,0.332029,0),(0,0,0),1,(-0.432686,-0.664058,0)]
-
+# initial conditions https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
+figure8 = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
+figure8add = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1.0000000001,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
+figure8sub = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(0.9999999999,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
+brouckeA1 = [()]
 NUM_BODIES = 3
 
 def Simulate(data_list, precision, run_name):
@@ -112,7 +114,7 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
         t0=t0,
         y0=f0,
         t_bound=10000, # used to be np.inf
-        rtol=1e-9,
+        rtol=3.162e-12, #1e-9
         atol=1e-12,
         max_step=np.inf # adaptive timestep
     )
@@ -121,8 +123,8 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
     times = []
     step_count = 0
 
-    COLLISION_THRESHOLD = 0.001   # bodies too close
-    ESCAPE_THRESHOLD = 50.0     # bodies too far apart
+    COLLISION_THRESHOLD = 0.0001   # bodies too close
+    ESCAPE_THRESHOLD = 100.0     # bodies too far apart
 
     while solver.status == 'running':
         solver.step()
@@ -223,12 +225,12 @@ with open(timestep_path, "r") as f:
             break
         print(line, end="")
 
-'''print(f"figure 8 added perturbation")
+print(f"figure 8 added perturbation")
 start = time.time()
 frames, timesteps = Simulate(figure8add, 0.005, "figure8add")
 end = time.time()
 
-path = Path.cwd() / "Simulated_Data"
+#path = Path.cwd() / "Simulated_Data"
 
 sim_data = read_phase_space(NUM_BODIES, path, "figure8add")
 print(f"Simulation computations lasted {end - start:.2f} s")
@@ -252,7 +254,7 @@ start = time.time()
 frames, timesteps = Simulate(figure8sub, 0.005, "figure8sub")
 end = time.time()
 
-path = Path.cwd() / "Simulated_Data"
+#path = Path.cwd() / "Simulated_Data"
 
 sim_data = read_phase_space(NUM_BODIES, path, "figure8sub")
 print(f"Simulation computations lasted {end - start:.2f} s")
@@ -269,4 +271,4 @@ with open(timestep_path, "r") as f:
     for i, line in enumerate(f):
         if i >= 10:
             break
-        print(line, end="")'''
+        print(line, end="")
