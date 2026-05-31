@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # load all three bodies [x, y, z, vx, vy, vz]
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\loopendedtriangleslowermax"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\brouckeA1"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
@@ -24,7 +24,7 @@ ax.scatter(body2[0, 0], body2[0, 1], color="darkgreen", s=40, zorder=5)
 
 ax.set_xlabel("x [–]")
 ax.set_ylabel("y [–]")
-ax.set_title("loopended triangles in 2D lower max")
+ax.set_title("broucke A1 in 2D")
 ax.set_aspect("equal")
 ax.legend()
 plt.tight_layout()

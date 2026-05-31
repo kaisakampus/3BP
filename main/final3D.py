@@ -9,7 +9,7 @@ from matplotlib.widgets import Button
 from matplotlib.lines import Line2D
 import time
 
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\ovalswithflourisheslowermax"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\orbit_O3"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
@@ -34,7 +34,7 @@ ax.set_zlim(-1, 1)
 ax.set_xlabel("x [–]")
 ax.set_ylabel("y [–]")
 ax.set_zlabel("z [–]")
-ax.set_title("loopended triangles in 3D simulation")
+ax.set_title("O3 in 3D simulation")
 ax.view_init(elev=25, azim=45)
 
 N = min(len(body0), len(body1), len(body2))
@@ -189,7 +189,7 @@ def on_save(event):
     writer   = FFMpegWriter(fps=30, bitrate=1800)
     outpath  = base + "_simulation.mp4"
     save_ani.save(outpath, writer=writer)
-    btn_save.label.set_text("Saved!")
+    btn_save.label.set_text("Saved")
     fig.canvas.draw_idle()
 
 def on_quit(event):

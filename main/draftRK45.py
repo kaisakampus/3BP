@@ -4,11 +4,21 @@ import time
 from pathlib import Path
 from scipy.integrate import RK45
 
+eps = 1e-10 # i use this large epsilon because i have dimensionless units and machine epsilon is insignificant in results
+
 # initial conditions https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
-figure8 = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
-figure8add = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1.0000000001,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
-figure8sub = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(0.9999999999,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
-brouckeA1 = [()]
+#figure8 = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
+#figure8add = [(-1+eps,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
+#figure8sub = [(-1-eps,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
+brouckeA1 = [(-0.9892620043,0,0),1,(0,1.9169244185,0),(2.2096177241,0,0),1,(0,0.1910268738,0),(-1.2203557197,0,0),1,(0,-2.1079512924,0)]
+brouckeA1add = [((-0.9892620043 + eps),0,0),1,(0,1.9169244185,0),(2.2096177241,0,0),1,(0,0.1910268738,0),(-1.2203557197,0,0),1,(0,-2.1079512924,0)]
+brouckeA1sub = [((-0.9892620043 - eps),0,0),1,(0,1.9169244185,0),(2.2096177241,0,0),1,(0,0.1910268738,0),(-1.2203557197,0,0),1,(0,-2.1079512924,0)]
+# initial conditions from https://arxiv.org/pdf/1303.0181
+butterflyI = [(-1,0,0),1,(0.30689,0.12551,0.0),(1,0,0),1,(0.30689,0.12551,0.0),(0,0,0),1,(-0.61378, -0.25102, 0)]
+# initial conditions from https://numericaltank.sjtu.edu.cn/three-body/three-body.htm
+orbit_O2 = [(-1,0,0),1,(-0.272600007460296,-0.432093711947155,0.629473407171139),(1,0,0),1,(-0.272600007460296,-0.432093711947155,-0.629473407171139),(0,0,1.02200578272669),1.2,(0.454333345767160,0.720156186578592,0.0)]
+orbit_O3 = [(-1,0,0),1,(0.402136910074724,0.180356951286259,0.210445128137873),(1,0,0),1,(0.402136910074724,0.180356951286259,-0.210445128137873),(0,0,0.476878264280312),1,(-0.804273820149448,-0.360713902572518,0.0)]
+
 NUM_BODIES = 3
 
 def Simulate(data_list, precision, run_name):
@@ -62,7 +72,7 @@ def acceleration_components(pos, body, MASS, NUM_BODIES):
 
             # softening because another code had it
             # i suppose this is to better regulate close encounters
-            r2 = rx * rx + ry * ry + rz * rz #+ 0.001**2
+            r2 = rx * rx + ry * ry + rz * rz #+ 0.01**2
             r3 = r2 ** 1.5
 
             # new acceleration
@@ -113,9 +123,9 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
         fun=lambda t, y: ode_system(t, y, MASS, NUM_BODIES),
         t0=t0,
         y0=f0,
-        t_bound=10000, # used to be np.inf
+        t_bound=10000, # used to be np.inf and 50
         rtol=3.162e-12, #1e-9
-        atol=1e-12,
+        atol=1e-12, #1e-13 can be both when fixed
         max_step=np.inf # adaptive timestep
     )
 
@@ -128,6 +138,13 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
 
     while solver.status == 'running':
         solver.step()
+
+        # enforce planar orbit - zero out z drift (numerical artifact)
+        '''y = solver.y.copy()
+        for b in range(NUM_BODIES):
+            y[b * 3 + 2] = 0.0                      # z position
+            y[3 * NUM_BODIES + b * 3 + 2] = 0.0    # z velocity
+        solver._y = y'''
 
         # print progress every 1000 steps
         if step_count % 1000000 == 0:
@@ -164,9 +181,20 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
     states = np.array(states)   # (T, 6*N)
     times = np.array(times)
 
+#chatgpt begins
+    T = len(states)
+
+    pos = states[:, :3*NUM_BODIES].reshape(T, NUM_BODIES, 3)
+    vel = states[:, 3*NUM_BODIES:].reshape(T, NUM_BODIES, 3)
+
+    frames = np.concatenate([pos, vel], axis=2)   # (T, N, 6)
+    frames = frames.transpose(1, 0, 2)            # (N, T, 6)
+
+#chatgpt ends
+# the original is lines 191-192
     # Reshape to (NUM_BODIES, T, 6)
-    states = states.reshape(-1, NUM_BODIES, 6) # (T, N, 6)
-    frames = states.transpose(1, 0, 2) # (N, T, 6)
+    #states = states.reshape(-1, NUM_BODIES, 6) # (T, N, 6)
+    #frames = states.transpose(1, 0, 2) # (N, T, 6)
 
 # difference (adaptive timestep)= times[i] - times[i-1]
 # step sizes chosen control its step size to maintain
@@ -199,76 +227,76 @@ def read_phase_space(NUM_BODIES, path, run_name):
     
     return phase_space_data
 
-print(f"figure 8")
+print(f"O2")
 start = time.time()
 # 1 simulation time unit is like 200 internal steps with dt=0.005
-frames, timesteps = Simulate(figure8, 0.005, "figure8")
+frames, timesteps = Simulate(orbit_O2, 0.005, "orbit_O2")
 end = time.time()
 
 #path = Path.cwd() / "Simulated_Data"
 path = Path(r"C:\Users\kaisa\My Drive\Simulated_Data")
 
-sim_data = read_phase_space(NUM_BODIES, path, "figure8")
+sim_data = read_phase_space(NUM_BODIES, path, "orbit_O2")
 print(f"Simulation computations lasted {end - start:.2f} s")
 print(f"Total timesteps: {len(timesteps)}")
 
 print("\n output of 10 rows for each body")
 for body in range(NUM_BODIES):
-    print(f"\nfigure8_Body {body}:")
+    print(f"\norbit_O2_Body {body}:")
     print(frames[body][:10])
 
 print("\n output of 10 rows of timestep sizes")
-timestep_path = path / "figure8_timestep_sizes.csv"
+timestep_path = path / "orbit_O2_timestep_sizes.csv"
 with open(timestep_path, "r") as f:
     for i, line in enumerate(f):
         if i >= 10:
             break
         print(line, end="")
 
-print(f"figure 8 added perturbation")
+print(f"O3")
 start = time.time()
-frames, timesteps = Simulate(figure8add, 0.005, "figure8add")
+frames, timesteps = Simulate(orbit_O3, 0.005, "orbit_O3")
 end = time.time()
 
 #path = Path.cwd() / "Simulated_Data"
 
-sim_data = read_phase_space(NUM_BODIES, path, "figure8add")
+sim_data = read_phase_space(NUM_BODIES, path, "orbit_O3")
 print(f"Simulation computations lasted {end - start:.2f} s")
 print(f"Total timesteps: {len(timesteps)}")
 
 print("\n output of 10 rows for each body")
 for body in range(NUM_BODIES):
-    print(f"\nfigure8add_Body {body}:")
+    print(f"\norbit_O3_Body {body}:")
     print(frames[body][:10])
 
 print("\n output of 10 rows of timestep sizes")
-timestep_path = path / "figure8add_timestep_sizes.csv"
+timestep_path = path / "orbit_O3_timestep_sizes.csv"
 with open(timestep_path, "r") as f:
     for i, line in enumerate(f):
         if i >= 10:
             break
         print(line, end="")
 
-print(f"figure 8 subtracted perturbation")
+'''print(f"broucke A1 subtracted perturbation")
 start = time.time()
-frames, timesteps = Simulate(figure8sub, 0.005, "figure8sub")
+frames, timesteps = Simulate(brouckeA1sub, 0.005, "brouckeA1sub")
 end = time.time()
 
 #path = Path.cwd() / "Simulated_Data"
 
-sim_data = read_phase_space(NUM_BODIES, path, "figure8sub")
+sim_data = read_phase_space(NUM_BODIES, path, "brouckeA1sub")
 print(f"Simulation computations lasted {end - start:.2f} s")
 print(f"Total timesteps: {len(timesteps)}")
 
 print("\n output of 10 rows for each body")
 for body in range(NUM_BODIES):
-    print(f"\nfigure8sub_Body {body}:")
+    print(f"\nbrouckeA1sub_Body {body}:")
     print(frames[body][:10])
 
 print("\n output of 10 rows of timestep sizes")
-timestep_path = path / "figure8sub_timestep_sizes.csv"
+timestep_path = path / "brouckeA1sub_timestep_sizes.csv"
 with open(timestep_path, "r") as f:
     for i, line in enumerate(f):
         if i >= 10:
             break
-        print(line, end="")
+        print(line, end="")'''
