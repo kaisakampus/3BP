@@ -299,76 +299,76 @@ def read_phase_space(NUM_BODIES, path, run_name):
     
     return phase_space_data
 
-'''print(f"figure 8")
-start = time.time()
+#print(f"figure 8")
+#start = time.time()
 # 1 simulation time unit is like 200 internal steps with dt=0.005, 2000 with dt=0.0005
 # making it stricter because the 3D visualised simulation is choppy right now
-frames, timesteps = Simulate(figure8, 0.0005, "figure8")
-end = time.time()
+#frames, timesteps = Simulate(figure8, 0.0005, "figure8")
+#end = time.time()
 
 #path = Path.cwd() / "Simulated_Data"
-path = Path(r"C:\Users\kaisa\My Drive\Simulated_Data")
+#path = Path(r"C:\Users\kaisa\My Drive\Simulated_Data")
 
-sim_data = read_phase_space(NUM_BODIES, path, "figure8")
-print(f"Simulation computations lasted {end - start:.2f} s")
-print(f"Total timesteps: {len(timesteps)}")
+#sim_data = read_phase_space(NUM_BODIES, path, "figure8")
+#print(f"Simulation computations lasted {end - start:.2f} s")
+#print(f"Total timesteps: {len(timesteps)}")
 
-print("\n output of 10 rows for each body")
-for body in range(NUM_BODIES):
-    print(f"\nfigure8_Body {body}:")
-    print(frames[body][:10])
+#print("\n output of 10 rows for each body")
+#for body in range(NUM_BODIES):
+#    print(f"\nfigure8_Body {body}:")
+#    print(frames[body][:10])
 
-print("\n output of 10 rows of timestep sizes")
-timestep_path = path / "figure8_timestep_sizes.csv"
-with open(timestep_path, "r") as f:
-    for i, line in enumerate(f):
-        if i >= 10:
-            break
-        print(line, end="")
+#print("\n output of 10 rows of timestep sizes")
+#timestep_path = path / "figure8_timestep_sizes.csv"
+#with open(timestep_path, "r") as f:
+#    for i, line in enumerate(f):
+#        if i >= 10:
+#            break
+#        print(line, end="")
 
-print(f"figure 8 + epsilon")
-start = time.time()
-frames, timesteps = Simulate(figure8add, 0.0005, "figure8add")
-end = time.time()
+#print(f"figure 8 + epsilon")
+#start = time.time()
+#frames, timesteps = Simulate(figure8add, 0.0005, "figure8add")
+#end = time.time()
 
-sim_data = read_phase_space(NUM_BODIES, path, "figure8add")
-print(f"Simulation computations lasted {end - start:.2f} s")
-print(f"Total timesteps: {len(timesteps)}")
+#sim_data = read_phase_space(NUM_BODIES, path, "figure8add")
+#print(f"Simulation computations lasted {end - start:.2f} s")
+#print(f"Total timesteps: {len(timesteps)}")
 
-print("\n output of 10 rows for each body")
-for body in range(NUM_BODIES):
-    print(f"\nfigure8add_Body {body}:")
-    print(frames[body][:10])
+#print("\n output of 10 rows for each body")
+#for body in range(NUM_BODIES):
+#    print(f"\nfigure8add_Body {body}:")
+#    print(frames[body][:10])
 
-print("\n output of 10 rows of timestep sizes")
-timestep_path = path / "figure8add_timestep_sizes.csv"
-with open(timestep_path, "r") as f:
-    for i, line in enumerate(f):
-        if i >= 10:
-            break
-        print(line, end="")
+#print("\n output of 10 rows of timestep sizes")
+#timestep_path = path / "figure8add_timestep_sizes.csv"
+#with open(timestep_path, "r") as f:
+#    for i, line in enumerate(f):
+#        if i >= 10:
+#            break
+#        print(line, end="")
 
-print(f"figure 8 - epsilon")
-start = time.time()
-frames, timesteps = Simulate(figure8sub, 0.0005, "figure8sub")
-end = time.time()
+#print(f"figure 8 - epsilon")
+#start = time.time()
+#frames, timesteps = Simulate(figure8sub, 0.0005, "figure8sub")
+#end = time.time()
 
-sim_data = read_phase_space(NUM_BODIES, path, "figure8sub")
-print(f"Simulation computations lasted {end - start:.2f} s")
-print(f"Total timesteps: {len(timesteps)}")
+#sim_data = read_phase_space(NUM_BODIES, path, "figure8sub")
+#print(f"Simulation computations lasted {end - start:.2f} s")
+#print(f"Total timesteps: {len(timesteps)}")
 
-print("\n output of 10 rows for each body")
-for body in range(NUM_BODIES):
-    print(f"\nfigure8sub_Body {body}:")
-    print(frames[body][:10])
+#print("\n output of 10 rows for each body")
+#for body in range(NUM_BODIES):
+#    print(f"\nfigure8sub_Body {body}:")
+#    print(frames[body][:10])
 
-print("\n output of 10 rows of timestep sizes")
-timestep_path = path / "figure8sub_timestep_sizes.csv"
-with open(timestep_path, "r") as f:
-    for i, line in enumerate(f):
-        if i >= 10:
-            break
-        print(line, end="")'''
+#print("\n output of 10 rows of timestep sizes")
+#timestep_path = path / "figure8sub_timestep_sizes.csv"
+#with open(timestep_path, "r") as f:
+#    for i, line in enumerate(f):
+#        if i >= 10:
+#            break
+#        print(line, end="")
 
 #deepai experiment to systemize this
 
