@@ -1,5 +1,6 @@
 # the order is heavily inspired by RK45 code snippet from https://github.com/LBrink05/Project-Period-3D-Simulations-of-Multi-Body-Star-Systems
 # great history story of 3BP: https://thevarsity.ca/2025/02/23/is-the-three-body-problem-unpredictable/
+# cool stuff https://gminton.org/#choreo
 
 import numpy as np
 import time
@@ -8,9 +9,9 @@ from scipy.integrate import RK45
 
 eps = 1e-10 # i use this large epsilon because i have dimensionless units and machine epsilon is insignificant in results
 
-#2D configurations
+#2D configurations (12 total)
 
-#easy
+#easy configuration from Li and Liao
 # initial conditions https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
 figure8 = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
 figure8add = [(-1+eps,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
@@ -34,12 +35,30 @@ ovalswithflourishesadd = [(0.716248295713+eps,0.384288553041,0),1,(1.24526823089
 ovalswithflourishessub = [(0.716248295713-eps,0.384288553041,0),1,(1.245268230896,2.444311951777,0),(0.086172594591,1.342795868577,0),1,(-0.67522432369,-0.96287961363,0),(0.538777980808,0.481049882656,0),1,(-0.570043907206,-1.481432338147,0)]
 
 # extra 2D
-#broucke A11
-#BROUCKEr1
-#BROUCKEA7
-#BROUCKEA10
-#ii-DRAGONFLY
-#III - Yin Yang: III-12.A.Beta
+# initial conditions from https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
+brouckeA11 = [(0.0132604844,0,0),1,(0,1.054151921,0),(1.4157286016,0,0),1,(0,-0.2101466639,0),(-1.4289890859,0,0),1,(0,-0.8440052572,0)]
+brouckeA11add = [(0.0132604844+eps,0,0),1,(0,1.054151921,0),(1.4157286016,0,0),1,(0,-0.2101466639,0),(-1.4289890859,0,0),1,(0,-0.8440052572,0)]
+brouckeA11 = [(0.0132604844-eps,0,0),1,(0,1.054151921,0),(1.4157286016,0,0),1,(0,-0.2101466639,0),(-1.4289890859,0,0),1,(0,-0.8440052572,0)]
+
+# initial conditions from https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
+brouckeR1 = [(0.808310623,0,0),1,(0,0.9901979166,0),(-0.4954148566,0,0),1,(0,-2.7171431768,0),(-0.3128957664,0,0),1,(0,1.7269452602,0)]
+brouckeR1add = [(0.808310623+eps,0,0),1,(0,0.9901979166,0),(-0.4954148566,0,0),1,(0,-2.7171431768,0),(-0.3128957664,0,0),1,(0,1.7269452602,0)]
+brouckeR1sub = [(0.808310623-eps,0,0),1,(0,0.9901979166,0),(-0.4954148566,0,0),1,(0,-2.7171431768,0),(-0.3128957664,0,0),1,(0,1.7269452602,0)]
+
+# initial conditions from https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
+brouckeA7 = [(-0.1095519101,0,0),1,(0,0.9913358338,0),(1.6613533905,0,0),1,(0,-0.1569959746,0),(-1.5518014804,0,0),1,(0,-0.8343398592,0)]
+brouckeA7add = [(-0.1095519101+eps,0,0),1,(0,0.9913358338,0),(1.6613533905,0,0),1,(0,-0.1569959746,0),(-1.5518014804,0,0),1,(0,-0.8343398592,0)]
+brouckeA7sub = [(-0.1095519101-eps,0,0),1,(0,0.9913358338,0),(1.6613533905,0,0),1,(0,-0.1569959746,0),(-1.5518014804,0,0),1,(0,-0.8343398592,0)]
+
+# initial conditions from https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
+brouckeA10 = [(-0.5426216182,0,0),1,(0,0.8750200467,0),(2.5274928067,0,0),1,(0,-0.0526955841,0),(-1.9848711885,0,0),1,(0,-0.8223244626,0)]
+brouckeA10add = [(-0.5426216182+eps,0,0),1,(0,0.8750200467,0),(2.5274928067,0,0),1,(0,-0.0526955841,0),(-1.9848711885,0,0),1,(0,-0.8223244626,0)]
+brouckeA10sub = [(-0.5426216182-eps,0,0),1,(0,0.8750200467,0),(2.5274928067,0,0),1,(0,-0.0526955841,0),(-1.9848711885,0,0),1,(0,-0.8223244626,0)]
+
+# initial conditions from https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
+yinyang312ABeta = [(-1,0,0),1,(0.417343,0.3131,0),(1,0,0),1,(0.417343,0.3131,0),(0,0,0),1,(-0.834686,-0.6262,0)]
+yinyang312ABetaadd = [(-1+eps,0,0),1,(0.417343,0.3131,0),(1,0,0),1,(0.417343,0.3131,0),(0,0,0),1,(-0.834686,-0.6262,0)]
+yinyang312ABetasub = [(-1-eps,0,0),1,(0.417343,0.3131,0),(1,0,0),1,(0.417343,0.3131,0),(0,0,0),1,(-0.834686,-0.6262,0)]
 
 # initial conditions https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
 brouckeA1 = [(-0.9892620043,0,0),1,(0,1.9169244185,0),(2.2096177241,0,0),1,(0,0.1910268738,0),(-1.2203557197,0,0),1,(0,-2.1079512924,0)]
@@ -67,14 +86,19 @@ orbit_O3 = [(-1,0,0),1,(0.402136910074724,0.180356951286259,0.210445128137873),(
 orbit_O3add = [(-1+eps,0,0),1,(0.402136910074724,0.180356951286259,0.210445128137873),(1,0,0),1,(0.402136910074724,0.180356951286259,-0.210445128137873),(0,0,0.476878264280312),1,(-0.804273820149448,-0.360713902572518,0.0)]
 orbit_O3sub = [(-1-eps,0,0),1,(0.402136910074724,0.180356951286259,0.210445128137873),(1,0,0),1,(0.402136910074724,0.180356951286259,-0.210445128137873),(0,0,0.476878264280312),1,(-0.804273820149448,-0.360713902572518,0.0)]
 
-#figure83D
-#figure83Dadd
-#figure83Dsub
+# initial conditions https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
+# since i could not find the initial conditions of chris moore configuration here https://briankoberlein.com/post/problematic/
+# i am gonna try to bend the trajectory myself
+#figure83D = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
+#figure8add3D = [(-1+eps,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
+#figure8sub3D = [(-1-eps,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
 
 # initial conditions from https://arxiv.org/pdf/2508.08568v1
 #0_26 from piano-trio orbits
 
 #MORE POSSIBLE 3D https://link.springer.com/article/10.1007/BF01595390
+
+
 NUM_BODIES = 3
 
 def Simulate(data_list, precision, run_name):
