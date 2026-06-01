@@ -374,7 +374,11 @@ def read_phase_space(NUM_BODIES, path, run_name):
 #deepai experiment to systemize this
 
 # List of configurations with their corresponding function and label
-configurations = [{"func": figure8, "name": "figure8"},
+configurations = [{"func": orbit_O26, "name": "orbit_O26"},
+{"func": orbit_O26add, "name": "orbit_O26add"},
+{"func": orbit_O26sub, "name": "orbit_O26sub"},
+
+'''{"func": figure8, "name": "figure8"},
 {"func": figure8add, "name": "figure8add"},
 {"func": figure8sub, "name": "figure8sub"},
 
@@ -424,7 +428,7 @@ configurations = [{"func": figure8, "name": "figure8"},
 
 {"func": yinyang312ABeta, "name": "yinyang312ABeta"},
 {"func": yinyang312ABetaadd, "name": "yinyang312ABetaadd"},
-{"func": yinyang312ABetasub, "name": "yinyang312ABetasub"},
+{"func": yinyang312ABetasub, "name": "yinyang312ABetasub"},'''
 ]
 
 # Loop through each configuration
