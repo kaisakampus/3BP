@@ -1,6 +1,7 @@
 # the order is heavily inspired by RK45 code snippet from https://github.com/LBrink05/Project-Period-3D-Simulations-of-Multi-Body-Star-Systems
 # great history story of 3BP: https://thevarsity.ca/2025/02/23/is-the-three-body-problem-unpredictable/
 # cool stuff https://gminton.org/#choreo
+# the example gif in overleaf has the accurate names finally https://screenager.dev/blog/2025/the-three-body-problem
 
 import numpy as np
 import time

@@ -9,7 +9,8 @@ from matplotlib.widgets import Button
 from matplotlib.lines import Line2D
 import time
 
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\orbit_O3"
+# base line has to be changed at the end to get the desired configuration
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\butterflyI"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
@@ -17,7 +18,7 @@ body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
 TRAIL = 80
 N_SEG = 30
 STEP  = 1       # advance 1 row per frame
-INTERVAL = 400  # ms between frames — increase to slow down
+INTERVAL = 400  # ms between frames, increase it if you want to slow down
 
 fig = plt.figure(figsize=(11, 9))
 ax  = fig.add_subplot(111, projection='3d')
@@ -34,7 +35,9 @@ ax.set_zlim(-1, 1)
 ax.set_xlabel("x [–]")
 ax.set_ylabel("y [–]")
 ax.set_zlabel("z [–]")
-ax.set_title("O3 in 3D simulation")
+
+# change the name accordingly
+ax.set_title("butterfly I in 3D simulation")
 ax.view_init(elev=25, azim=45)
 
 N = min(len(body0), len(body1), len(body2))
@@ -51,15 +54,15 @@ info_text = fig.text(0.76, 0.88,
 #trail_segs2 = [ax.plot([], [], [], color="lime",      lw=1, alpha=(i+1)/N_SEG)[0] for i in range(N_SEG)]
 
 alphas = [float((i+1)**1 / N_SEG**1) for i in range(N_SEG)]
-trail_segs0 = [ax.plot([], [], [], color="turquoise", lw=1, alpha=alphas[i])[0] for i in range(N_SEG)]
-trail_segs1 = [ax.plot([], [], [], color="deeppink",  lw=1, alpha=alphas[i])[0] for i in range(N_SEG)]
-trail_segs2 = [ax.plot([], [], [], color="lime",      lw=1, alpha=alphas[i])[0] for i in range(N_SEG)]
+# use lw=1 for lines
+trail_segs0 = [ax.plot([], [], [], color="turquoise", lw=2, alpha=alphas[i])[0] for i in range(N_SEG)]
+trail_segs1 = [ax.plot([], [], [], color="deeppink",  lw=2, alpha=alphas[i])[0] for i in range(N_SEG)]
+trail_segs2 = [ax.plot([], [], [], color="lime",      lw=2, alpha=alphas[i])[0] for i in range(N_SEG)]
 
 # faint ghost of full orbit
 ax.plot(body0[:, 0], body0[:, 1], body0[:, 2], color="grey",     lw=0.3, alpha=0.2)
 ax.plot(body1[:, 0], body1[:, 1], body1[:, 2], color="grey", lw=0.3, alpha=0.2)
 ax.plot(body2[:, 0], body2[:, 1], body2[:, 2], color="grey",    lw=0.3, alpha=0.2)
-#the example gif in overleaf has the accurate names finally https://screenager.dev/blog/2025/the-three-body-problem
 
 #maybe try doing it like this https://cloud.anylogic.com/model/f1999d97-8de2-4804-9940-5ae261d7ad86?mode=SETTINGS&tab=GENERAL
 
@@ -67,6 +70,11 @@ ax.plot(body2[:, 0], body2[:, 1], body2[:, 2], color="grey",    lw=0.3, alpha=0.
 dot0, = ax.plot([], [], [], 'o', color="deepskyblue", ms=4, zorder=6)
 dot1, = ax.plot([], [], [], 'o', color="red",          ms=4, zorder=6)
 dot2, = ax.plot([], [], [], 'o', color="lightgreen",   ms=4, zorder=6)
+
+# Hollow circles with no fill
+#dot0, = ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='deepskyblue', ms=8, zorder=6)
+#dot1, = ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='red', ms=8, zorder=6)
+#dot2, = ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='lightgreen', ms=8, zorder=6)
 
 # legend
 legend_elements = [
@@ -76,7 +84,7 @@ legend_elements = [
 ]
 ax.legend(handles=legend_elements, loc="upper left", fontsize=9)
 
-# state
+# frame when paused
 state          = {"frame": 0, "paused": False}
 sim_start_time = None
 pause_start    = None
@@ -177,7 +185,7 @@ def on_save(event):
     state["paused"] = True
     pause_start     = time.time()
     btn_pause.label.set_text("Resume")
-    btn_save.label.set_text("Saving...")
+    btn_save.label.set_text("Saving")
     fig.canvas.draw_idle()
 
     def save_update(f):
@@ -186,7 +194,7 @@ def on_save(event):
             (trail_segs1, dot1, body1),
             (trail_segs2, dot2, body2),
         ])
-        info_text.set_text("step: {:>6} / {}\nT    = saving...".format(f, N))
+        info_text.set_text("step: {:>6} / {}\nT    = saving".format(f, N))
 
     save_ani = FuncAnimation(fig, save_update, frames=range(0, N, STEP), blit=False)
     writer   = FFMpegWriter(fps=30, bitrate=1800)
