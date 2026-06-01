@@ -59,6 +59,9 @@ trail_segs2 = [ax.plot([], [], [], color="lime",      lw=1, alpha=alphas[i])[0] 
 ax.plot(body0[:, 0], body0[:, 1], body0[:, 2], color="grey",     lw=0.3, alpha=0.2)
 ax.plot(body1[:, 0], body1[:, 1], body1[:, 2], color="grey", lw=0.3, alpha=0.2)
 ax.plot(body2[:, 0], body2[:, 1], body2[:, 2], color="grey",    lw=0.3, alpha=0.2)
+#the example gif in overleaf has the accurate names finally https://screenager.dev/blog/2025/the-three-body-problem
+
+#maybe try doing it like this https://cloud.anylogic.com/model/f1999d97-8de2-4804-9940-5ae261d7ad86?mode=SETTINGS&tab=GENERAL
 
 # animated dots
 dot0, = ax.plot([], [], [], 'o', color="deepskyblue", ms=4, zorder=6)
