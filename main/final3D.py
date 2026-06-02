@@ -10,7 +10,7 @@ from matplotlib.lines import Line2D
 import time
 
 # base line has to be changed at the end to get the desired configuration
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\orbit_O26"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\brouckeA2"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
@@ -37,7 +37,7 @@ ax.set_ylabel("y [–]")
 ax.set_zlabel("z [–]")
 
 # change the name accordingly
-ax.set_title("butterfly I in 3D simulation")
+ax.set_title("O26 in 3D simulation")
 ax.view_init(elev=25, azim=45)
 
 N = min(len(body0), len(body1), len(body2))
@@ -53,28 +53,37 @@ info_text = fig.text(0.76, 0.88,
 #trail_segs1 = [ax.plot([], [], [], color="deeppink",  lw=1, alpha=(i+1)/N_SEG)[0] for i in range(N_SEG)]
 #trail_segs2 = [ax.plot([], [], [], color="lime",      lw=1, alpha=(i+1)/N_SEG)[0] for i in range(N_SEG)]
 
+#trying to make it like this https://cloud.anylogic.com/model/f1999d97-8de2-4804-9940-5ae261d7ad86?mode=SETTINGS&tab=GENERAL
+
 alphas = [float((i+1)**1 / N_SEG**1) for i in range(N_SEG)]
 # use lw=1 for lines
-trail_segs0 = [ax.plot([], [], [], color="turquoise", lw=2, alpha=alphas[i])[0] for i in range(N_SEG)]
-trail_segs1 = [ax.plot([], [], [], color="deeppink",  lw=2, alpha=alphas[i])[0] for i in range(N_SEG)]
-trail_segs2 = [ax.plot([], [], [], color="lime",      lw=2, alpha=alphas[i])[0] for i in range(N_SEG)]
+#trail_segs0 = [ax.plot([], [], [], color="turquoise", lw=1, alpha=alphas[i])[0] for i in range(N_SEG)]
+#trail_segs1 = [ax.plot([], [], [], color="deeppink",  lw=1, alpha=alphas[i])[0] for i in range(N_SEG)]
+#trail_segs2 = [ax.plot([], [], [], color="lime",      lw=1, alpha=alphas[i])[0] for i in range(N_SEG)]
+#trail_segs0 = [ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='turquoise', ms=6, alpha=alphas[i])[0] for i in range(N_SEG)]
+#trail_segs1 = [ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='deeppink', ms=6, alpha=alphas[i])[0] for i in range(N_SEG)]
+#trail_segs2 = [ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='lime', ms=6, alpha=alphas[i])[0] for i in range(N_SEG)]
+# Instead, create scatter plots for the trails:
+trail_segs0 = [ax.scatter([], [], [], marker='o', facecolors='none', edgecolors='turquoise', s=36, alpha=alphas[i]) for i in range(N_SEG)]
+trail_segs1 = [ax.scatter([], [], [], marker='o', facecolors='none', edgecolors='deeppink', s=36, alpha=alphas[i]) for i in range(N_SEG)]
+trail_segs2 = [ax.scatter([], [], [], marker='o', facecolors='none', edgecolors='lime', s=36, alpha=alphas[i]) for i in range(N_SEG)]
+
+for scatter in trail_segs0:
+    scatter.set_color('turquoise') 
+for scatter in trail_segs1:
+    scatter.set_color('DEEPPINK')
+for scatter in trail_segs2:
+    scatter.set_color('lime')
 
 # faint ghost of full orbit
 ax.plot(body0[:, 0], body0[:, 1], body0[:, 2], color="grey",     lw=0.3, alpha=0.2)
 ax.plot(body1[:, 0], body1[:, 1], body1[:, 2], color="grey", lw=0.3, alpha=0.2)
 ax.plot(body2[:, 0], body2[:, 1], body2[:, 2], color="grey",    lw=0.3, alpha=0.2)
 
-#maybe try doing it like this https://cloud.anylogic.com/model/f1999d97-8de2-4804-9940-5ae261d7ad86?mode=SETTINGS&tab=GENERAL
-
 # animated dots
 dot0, = ax.plot([], [], [], 'o', color="deepskyblue", ms=4, zorder=6)
 dot1, = ax.plot([], [], [], 'o', color="red",          ms=4, zorder=6)
 dot2, = ax.plot([], [], [], 'o', color="lightgreen",   ms=4, zorder=6)
-
-# Hollow circles with no fill
-#dot0, = ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='deepskyblue', ms=8, zorder=6)
-#dot1, = ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='red', ms=8, zorder=6)
-#dot2, = ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='lightgreen', ms=8, zorder=6)
 
 # legend
 legend_elements = [
@@ -96,18 +105,33 @@ def draw_trails(f, body_list):
     seg_len = max(1, length // N_SEG)
 
     for segs, dot, body in body_list:
+
+        #if segs is trail_segs0:
+            #color = 'turquoise'
+        #elif segs is trail_segs1:
+            #color = 'deeppink'
+        #elif segs is trail_segs2:
+            #color = 'lime'
+        #else:
+            #color = 'grey'  # fallback
+
         for i, seg in enumerate(segs):
             s = start + i * seg_len
             e = start + (i + 1) * seg_len + 1
             if i == N_SEG - 1:
                 e = f + 1
             if s >= f:
-                seg.set_data([], [])
-                seg.set_3d_properties([])
+                #seg.set_data([], [])
+                #seg.set_3d_properties([])
+                seg._offsets3d = (np.empty(0),np.empty(0), np.empty(0))
+                #seg.set_3d_properties(np.empty(0), zdir='z')
             else:
-                seg.set_data(body[s:e, 0], body[s:e, 1])
-                seg.set_3d_properties(body[s:e, 2])
-
+                seg._offsets3d=(body[s:e, 0], body[s:e, 1], body[s:e, 2])
+                #seg.set_offsets(body[s:e, :2])
+                #seg.set_3d_properties(body[s:e, 2], zdir='z')
+                #seg.set_data(body[s:e, 0], body[s:e, 1])
+                #seg.set_3d_properties(body[s:e, 2])
+            #seg.set_facecolor('none')
         dot.set_data([body[f, 0]], [body[f, 1]])
         dot.set_3d_properties([body[f, 2]])
 
@@ -128,6 +152,22 @@ def update(frame):
         (trail_segs1, dot1, body1),
         (trail_segs2, dot2, body2),
     ])
+
+# Determine current particle colors
+    # Replace these with your actual color logic if available
+    #color0 = "deepskyblue"   # For particle 0
+    #color1 = "red"           # For particle 1
+    #color2 = "lightgreen"    # For particle 2
+
+    #for scatter in trail_segs0:
+        #scatter.set_facecolors('none')
+        #scatter.set_edgecolors('turquoise')
+    #for scatter in trail_segs1:
+        #scatter.set_facecolors('none')
+        #scatter.set_edgecolors('deeppink')
+    #for scatter in trail_segs2:
+        #scatter.set_facecolors('none')
+        #scatter.set_edgecolors('lime')'''
 
     info_text.set_text("step: {:>6} / {}\nT    = {:.2f}s".format(f, N, elapsed))
 
