@@ -10,7 +10,7 @@ from matplotlib.lines import Line2D
 import time
 
 # base line has to be changed at the end to get the desired configuration
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\brouckeA2"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\ovalswithflourishes"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
@@ -37,7 +37,54 @@ ax.set_ylabel("y [–]")
 ax.set_zlabel("z [–]")
 
 # change the name accordingly
-ax.set_title("O26 in 3D simulation")
+ax.set_title("ovals with flourishes in 3D simulation")
+def update(frame):
+    global sim_start_time, pause_start, total_paused
+
+    if state["paused"]:
+        return []
+
+    if sim_start_time is None:
+        sim_start_time = time.time()
+
+    f       = state["frame"]
+
+    # ai input begins
+    #margin = 10  # adjust to taste
+    #cx = np.mean([body0[f,0], body1[f,0], body2[f,0]])
+    #cy = np.mean([body0[f,1], body1[f,1], body2[f,1]])
+    #ax.set_xlim(cx - margin, cx + margin)
+    #ax.set_ylim(cy - margin, cy + margin)
+    #elapsed = time.time() - sim_start_time - total_paused
+    # ai input ends
+
+    draw_trails(f, [
+        (trail_segs0, dot0, body0),
+        (trail_segs1, dot1, body1),
+        (trail_segs2, dot2, body2),
+    ])
+
+# Determine current particle colors
+    # Replace these with your actual color logic if available
+    #color0 = "deepskyblue"   # For particle 0
+    #color1 = "red"           # For particle 1
+    #color2 = "lightgreen"    # For particle 2
+
+    #for scatter in trail_segs0:
+        #scatter.set_facecolors('none')
+        #scatter.set_edgecolors('turquoise')
+    #for scatter in trail_segs1:
+        #scatter.set_facecolors('none')
+        #scatter.set_edgecolors('deeppink')
+    #for scatter in trail_segs2:
+        #scatter.set_facecolors('none')
+        #scatter.set_edgecolors('lime')'''
+
+    info_text.set_text("step: {:>6} / {}\nT    = {:.2f}s".format(f, N, elapsed))
+
+    state["frame"] = (f + STEP) % N
+    return []
+
 ax.view_init(elev=25, azim=45)
 
 N = min(len(body0), len(body1), len(body2))
@@ -145,7 +192,15 @@ def update(frame):
         sim_start_time = time.time()
 
     f       = state["frame"]
+
+    # ai input begins
+    #margin = 1  # adjust to taste
+    #cx = np.mean([body0[f,0], body1[f,0], body2[f,0]])
+    #cy = np.mean([body0[f,1], body1[f,1], body2[f,1]])
+    #ax.set_xlim(cx - margin, cx + margin)
+    #ax.set_ylim(cy - margin, cy + margin)
     elapsed = time.time() - sim_start_time - total_paused
+    # ai input ends
 
     draw_trails(f, [
         (trail_segs0, dot0, body0),
