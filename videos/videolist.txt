@@ -8,3 +8,15 @@ final analysis will be done on:
 7. yinyangIII
 8. O3
 9. O26
+
+videos produced on configurations left unpursued:
+1. yarn
+2. yinyang
+
+configurations that did not work (behaves nothing like reference picture):
+1. A10
+2. R1
+3. O2
+4. pythagorean
+5. loopended triangles
+6. ovals with flourishes
