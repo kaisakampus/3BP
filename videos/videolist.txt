@@ -1,0 +1,10 @@
+final analysis will be done on:
+1. broucke A1
+2. A2
+3. A7
+4. A11
+5. butterfly I
+6. figure 8
+7. yinyangIII
+8. O3
+9. O26
