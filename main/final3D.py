@@ -10,7 +10,7 @@ from matplotlib.lines import Line2D
 import time
 
 # base line has to be changed at the end to get the desired configuration
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\ovalswithflourishes"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\orbit_O3"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
@@ -37,7 +37,7 @@ ax.set_ylabel("y [–]")
 ax.set_zlabel("z [–]")
 
 # change the name accordingly
-ax.set_title("ovals with flourishes in 3D simulation")
+ax.set_title("O3 in 3D simulation")
 def update(frame):
     global sim_start_time, pause_start, total_paused
 
