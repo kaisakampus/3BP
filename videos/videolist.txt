@@ -24,3 +24,7 @@ configurations that did not work (behaves nothing like reference picture):
 5. loopended triangles
 6. ovals with flourishes
 7. O51 - perturbaition on r_xyz
+
+new:
+1. catface
+2. gear
