@@ -1,7 +1,7 @@
 # the order is heavily inspired by RK45 code snippet from https://github.com/LBrink05/Project-Period-3D-Simulations-of-Multi-Body-Star-Systems
 # great history story of 3BP: https://thevarsity.ca/2025/02/23/is-the-three-body-problem-unpredictable/
 # cool stuff https://gminton.org/#choreo
-# the example gif in overleaf has the accurate names finally https://screenager.dev/blog/2025/the-three-body-problem
+# check the example gif configuration names https://screenager.dev/blog/2025/the-three-body-problem
 
 import numpy as np
 import time
@@ -14,7 +14,7 @@ eps = 1e-10 # i use this large epsilon because i have dimensionless units and ma
 
 #easy configuration from Li and Liao
 # initial conditions https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
-'''figure8 = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
+figure8 = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
 figure8add = [(-1+eps,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
 figure8sub = [(-1-eps,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
 
@@ -75,12 +75,18 @@ butterflyIsub = [(-1-eps,0,0),1,(0.30689,0.12551,0.0),(1,0,0),1,(0.30689,0.12551
 pythagorean = [(1,3,0),3,(0,0,0),(-2,-1,0),4,(0,0,0),(1,-1,0),5,(0,0,0)]
 pythagoreanadd = [(1+eps,3,0),3,(0,0,0),(-2,-1,0),4,(0,0,0),(1,-1,0),5,(0,0,0)]
 pythagoreansub = [(1-eps,3,0),3,(0,0,0),(-2,-1,0),4,(0,0,0),(1,-1,0),5,(0,0,0)]
-'''
-# initial conditions from https://arxiv.org/pdf/1303.0181
-#yarn_add = [(-1+eps,0,0), 1, (0.55906, 0.34919, 0),(1,0,0),  1, (0.55906, 0.34919, 0),(0,0,0),  1, (-1.11812, -0.69838, 0)]
-#yarn_sub = [(-1-eps,0,0), 1, (0.55906, 0.34919, 0),(1,0,0),  1, (0.55906, 0.34919, 0),(0,0,0),  1, (-1.11812, -0.69838, 0)]
 
-'''#3D configurations (3 total)
+# initial conditions from https://arxiv.org/pdf/1303.0181
+# yarn without perturbation was ran in another code
+yarn_add = [(-1+eps,0,0), 1, (0.55906, 0.34919, 0),(1,0,0),  1, (0.55906, 0.34919, 0),(0,0,0),  1, (-1.11812, -0.69838, 0)]
+yarn_sub = [(-1-eps,0,0), 1, (0.55906, 0.34919, 0),(1,0,0),  1, (0.55906, 0.34919, 0),(0,0,0),  1, (-1.11812, -0.69838, 0)]
+
+# initial conditions from https://arxiv.org/pdf/1303.0181
+# yinyang without perturbation was ran in another code
+yinyangadd = [(-1+eps,0,0),1,(0.513938,0.304736,0),(1,0,0),1,(0.513938,0.304736,0),(0,0,0),1,(-1.027876,-0.609472,0)]
+yinyangsub = [(-1-eps,0,0),1,(0.513938,0.304736,0),(1,0,0),1,(0.513938,0.304736,0),(0,0,0),1,(-1.027876,-0.609472,0)]
+
+#3D configurations (3 total)
 
 # initial conditions from https://numericaltank.sjtu.edu.cn/three-body/three-body.htm
 orbit_O2 = [(-1,0,0),1,(-0.272600007460296,-0.432093711947155,0.629473407171139),(1,0,0),1,(-0.272600007460296,-0.432093711947155,-0.629473407171139),(0,0,1.02200578272669),1.2,(0.454333345767160,0.720156186578592,0.0)]
@@ -92,34 +98,15 @@ orbit_O3 = [(-1,0,0),1,(0.402136910074724,0.180356951286259,0.210445128137873),(
 orbit_O3add = [(-1+eps,0,0),1,(0.402136910074724,0.180356951286259,0.210445128137873),(1,0,0),1,(0.402136910074724,0.180356951286259,-0.210445128137873),(0,0,0.476878264280312),1,(-0.804273820149448,-0.360713902572518,0.0)]
 orbit_O3sub = [(-1-eps,0,0),1,(0.402136910074724,0.180356951286259,0.210445128137873),(1,0,0),1,(0.402136910074724,0.180356951286259,-0.210445128137873),(0,0,0.476878264280312),1,(-0.804273820149448,-0.360713902572518,0.0)]
 
-# initial conditions https://observablehq.com/@rreusser/periodic-planar-three-body-orbits
-# since i could not find the initial conditions of chris moore configuration here https://briankoberlein.com/post/problematic/
-# i am gonna try to bend the trajectory myself
-#figure83D = [(-1,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
-#figure8add3D = [(-1+eps,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
-#figure8sub3D = [(-1-eps,0,0),1,(0.3471168881,0.5327249454,0),(1,0,0),1,(0.3471168881,0.5327249454,0),(0,0,0),1,(-0.6942337762,-1.0654498908,0)]
-
 # initial conditions from https://numericaltank.sjtu.edu.cn/three-body/three-body.htm
 orbit_O26 = [(-1,0,0), 1, (0.402136910074724, 0.180356951286259, 0.210445128137873), (1,0,0), 1, (0.402136910074724, 0.180356951286259, -0.210445128137873), (0,0,6.17172796472047e-01), 1, (-0.804273820149448, -0.360713902572518, 0)]
 orbit_O26add = [(-1+eps,0,0), 1, (0.402136910074724, 0.180356951286259, 0.210445128137873), (1,0,0), 1, (0.402136910074724, 0.180356951286259, -0.210445128137873), (0,0,6.17172796472047e-01), 1, (-0.804273820149448, -0.360713902572518, 0)]
-orbit_O26sub = [(-1-eps,0,0), 1, (0.402136910074724, 0.180356951286259, 0.210445128137873), (1,0,0), 1, (0.402136910074724, 0.180356951286259, -0.210445128137873), (0,0,6.17172796472047e-01), 1, (-0.804273820149448, -0.360713902572518, 0)]'''
+orbit_O26sub = [(-1-eps,0,0), 1, (0.402136910074724, 0.180356951286259, 0.210445128137873), (1,0,0), 1, (0.402136910074724, 0.180356951286259, -0.210445128137873), (0,0,6.17172796472047e-01), 1, (-0.804273820149448, -0.360713902572518, 0)]
 
-'''# O_50(0.4) - linearly stable, T = 105.330623626924
-panio_trio_O50_04 = [
-    (-1, 0,       0      ),  1,    ( 0.24986795610137,  0.03498530423433,  0.00034357631743),
-    ( 1, 0,       0      ),  1,    ( 0.24986795610137,  0.03498530423433, -0.00034357631743),
-    ( 0, 0,       0.21275290348332),  0.4,  (-1.24933978050685, -0.17492652117165,  0.0),
-]
-panio_trio_O50_04_add = [
-    (-1+eps, 0,       0      ),  1,    ( 0.24986795610137,  0.03498530423433,  0.00034357631743),
-    ( 1, 0,       0      ),  1,    ( 0.24986795610137,  0.03498530423433, -0.00034357631743),
-    ( 0, 0,       0.21275290348332),  0.4,  (-1.24933978050685, -0.17492652117165,  0.0),
-]
-panio_trio_O50_04_sub = [
-    (-1-eps, 0,       0      ),  1,    ( 0.24986795610137,  0.03498530423433,  0.00034357631743),
-    ( 1, 0,       0      ),  1,    ( 0.24986795610137,  0.03498530423433, -0.00034357631743),
-    ( 0, 0,       0.21275290348332),  0.4,  (-1.24933978050685, -0.17492652117165,  0.0),
-]'''
+# O_50(0.4) - linearly stable, T = 105.330623626924
+panio_trio_O50_04 = [(-1,0,0),1,(0.24986795610137,0.03498530423433,0.00034357631743),(1,0,0),1,(0.24986795610137,0.03498530423433,-0.00034357631743),(0,0,0.21275290348332),0.4,(-1.24933978050685,-0.17492652117165,0),]
+panio_trio_O50_04_add = [(-1+eps,0,0),1,(0.24986795610137,0.03498530423433,0.00034357631743),(1,0,0),1,(0.24986795610137,0.03498530423433,-0.00034357631743),(0,0,0.21275290348332),0.4,(-1.24933978050685,-0.17492652117165,0),]
+panio_trio_O50_04_sub = [(-1-eps,0,0),1,(0.24986795610137,0.03498530423433,0.00034357631743),(1,0,0),1,(0.24986795610137,0.03498530423433,-0.00034357631743),(0,0,0.21275290348332),0.4,(-1.24933978050685,-0.17492652117165,0),]
 
 panio_trio_O51_05 = [
     (-1, 0,  0      ),  1,    ( 0.30193851769471,  0.07653448180274, -0.00547987697775),
@@ -148,7 +135,6 @@ def Simulate(data_list, precision, run_name):
 
     # conditions for time and frames
     timestep = float(precision)
-    #total_steps = int(duration * 24 / timestep) + 1  # to include t=0
     sample_every = max(1, int(1 / timestep))
 
     # the saved frames should correspond to the sampled position
@@ -156,6 +142,7 @@ def Simulate(data_list, precision, run_name):
         sample_every, NUM_BODIES, start_pos, start_vel, mass)
 
     # save CSV files to computer folder Simulated_Data
+    # gave up on trying to save them to GitHub..
     PATH_FILES = Path(r"C:\Users\kaisa\My Drive")
     my_dir = PATH_FILES / "Simulated_Data"
     my_dir.mkdir(parents=True, exist_ok=True)
@@ -190,6 +177,7 @@ def acceleration_components(pos, body, MASS, NUM_BODIES):
 
             # softening because another code had it (link on 1st line)
             # i suppose this is to better regulate close encounters
+            # visuals still look rough around the edges though
             r2 = rx * rx + ry * ry + rz * rz #+ 0.01**2
             r3 = r2 ** 1.5
 
@@ -234,7 +222,7 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
     # fixed timestep:
     # t_end = (TOTAL_STEPS - 1) * TIMESTEP
 
-    # Initial state vector
+    # initial state vector
     f0 = np.concatenate([START_POS.flatten(), START_VEL.flatten()])
 
     solver = RK45(
@@ -243,7 +231,7 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
         y0=f0,
         t_bound=10000, # used to be np.inf and 50
         rtol=3.162e-12, #1e-9
-        atol=1e-12, #1e-13 can be both when fixed
+        atol=1e-12, #1e-13 can be both when fixed?
         max_step=np.inf # adaptive timestep
     )
 
@@ -258,7 +246,7 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
         solver.step()
 
         # print progress every 1000 steps because i am anxious and skeptical whether this actually works
-        #nvm i ran it and it does
+        #nevermind i ran it and it does
         if step_count % 1000000 == 0:
             print(f"Step NR. {step_count}, time of run thus far = {solver.t:.4f}, timestep = {solver.h_abs:.6f}")
         
@@ -286,14 +274,11 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
 
         step_count += 1 # because i am only using timer not actually timing the true fixed timestep simulation in the end
 
-# first version
-    # Extract positions and velocities
-
-    # Convert to arrays
+    # convert to arrays
     states = np.array(states)   # (T, 6*N)
     times = np.array(times)
 
-#chatgpt begins
+# ai input begins
 # validation round made me realize mistake in data shaping in the data file which messed up the 3D visualisation
     T = len(states)
 
@@ -303,8 +288,9 @@ def position_sampled(SAMPLE_EVERY, NUM_BODIES, START_POS, START_VEL, MASS):
     frames = np.concatenate([pos, vel], axis=2)   # (T, N, 6)
     frames = frames.transpose(1, 0, 2)            # (N, T, 6)
 
-#chatgpt ends
+# ai input ends
 
+    # the old version
     # Reshape to (NUM_BODIES, T, 6)
     #states = states.reshape(-1, NUM_BODIES, 6) # (T, N, 6)
     #frames = states.transpose(1, 0, 2) # (N, T, 6)
@@ -337,6 +323,7 @@ def read_phase_space(NUM_BODIES, path, run_name):
     
     return phase_space_data
 
+# initial
 #print(f"figure 8")
 #start = time.time()
 # 1 simulation time unit is like 200 internal steps with dt=0.005, 2000 with dt=0.0005
@@ -408,78 +395,10 @@ def read_phase_space(NUM_BODIES, path, run_name):
 #            break
 #        print(line, end="")
 
-#deepai experiment to systemize this
+#now deepai experiment to systemize this
+configurations = [{"func": yinyangadd, "name":"yinyangadd"},{"func":yinyangsub, "name": "yinyangsub"},]
 
-# List of configurations with their corresponding function and label
-configurations = [{"func": panio_trio_O51_05_sub, "name":"panio_trio_O51_05_sub"},
-                {"func":panio_trio_O51_05_add, "name": "panio_trio_O51_05_add"},
-{"func": panio_trio_O51_05, "name":"panio_trio_O51_05"}]
-    
-    
-'''{"func": panio_trio_O50_04, "name" :"panio_trio_O50_04"},
-{"func": panio_trio_O50_04_add, "name" :"panio_trio_O50_04_add"},
-{"func": panio_trio_O50_04_sub, "name" :"panio_trio_O50_04_sub"},
-{"func": yarn_add, "name": "yarn_add"},
-{"func": yarn_sub, "name": "yarn_sub"}]'''
-    
-'''{"func": orbit_O26, "name": "orbit_O26"},
-{"func": orbit_O26add, "name": "orbit_O26add"},
-{"func": orbit_O26sub, "name": "orbit_O26sub"},
-
-{"func": figure8, "name": "figure8"},
-{"func": figure8add, "name": "figure8add"},
-{"func": figure8sub, "name": "figure8sub"},
-
-{"func": brouckeA2, "name": "brouckeA2"},
-{"func": brouckeA2add, "name": "brouckeA2add"},
-{"func": brouckeA2sub, "name": "brouckeA2sub"},
-
-{"func": loopendedtriangles, "name": "loopendedtriangles"},
-{"func": loopendedtrianglesadd, "name": "loopendedtrianglesadd"},
-{"func": loopendedtrianglessub, "name": "loopendedtrianglessub"},
-
-{"func": ovalswithflourishes, "name": "ovalswithflourishes"},
-{"func": ovalswithflourishesadd, "name": "ovalswithflourishesadd"},
-{"func": ovalswithflourishessub, "name": "ovalswithflourishessub"},
-
-{"func": brouckeA11, "name": "brouckeA11"},
-{"func": brouckeA11add, "name": "brouckeA11add"},
-{"func": brouckeA11sub, "name": "brouckeA11sub"},
-
-{"func": brouckeA1, "name": "brouckeA1"},
-{"func": brouckeA1add, "name": "brouckeA1add"},
-{"func": brouckeA1sub, "name": "brouckeA1sub"},
-
-{"func": brouckeR1, "name": "brouckeR1"},
-{"func": brouckeR1add, "name": "brouckeR1add"},
-{"func": brouckeR1sub, "name": "brouckeR1sub"},
-
-{"func": brouckeA7, "name": "brouckeA7"},
-{"func": brouckeA7add, "name": "brouckeA7add"},
-{"func": brouckeA7sub, "name": "brouckeA7sub"},
-
-{"func": brouckeA10, "name": "brouckeA10"},
-{"func": brouckeA10add, "name": "brouckeA10add"},
-{"func": brouckeA10sub, "name": "brouckeA10sub"},
-
-{"func": brouckeA1, "name": "brouckeA1"},
-{"func": brouckeA1add, "name": "brouckeA1add"},
-{"func": brouckeA1sub, "name": "brouckeA1sub"},
-
-{"func": butterflyI, "name": "butterflyI"},
-{"func": butterflyIadd, "name": "butterflyIadd"},
-{"func": butterflyIsub, "name": "butterflyIsub"},
-
-{"func": pythagorean, "name": "pythagorean"},
-{"func": pythagoreanadd, "name": "pythagoreanadd"},
-{"func": pythagoreansub, "name": "pythagoreansub"},
-
-{"func": yinyang312ABeta, "name": "yinyang312ABeta"},
-{"func": yinyang312ABetaadd, "name": "yinyang312ABetaadd"},
-{"func": yinyang312ABetasub, "name": "yinyang312ABetasub"},
-]'''
-
-# Loop through each configuration
+# loop through each configuration
 for config in configurations:
     print(f"\n{config['name']}")
 
@@ -488,7 +407,7 @@ for config in configurations:
     frames, timesteps = Simulate(config['func'], 0.0005, config['name'])
     end_time = time.time()
 
-    # print summary info
+    # print summary after run of 1 configuration ends
     path = Path(r"C:\Users\kaisa\My Drive\Simulated_Data")
     sim_data = read_phase_space(NUM_BODIES, path, config['name'])
     print(f"Simulation computations lasted {end_time - start_time:.2f} s")
