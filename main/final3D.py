@@ -10,7 +10,7 @@ from matplotlib.lines import Line2D
 import time
 
 # base line has to be changed at the end to get the desired configuration
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\panio_trio_O51_05_add"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\brouckeA2_NEW"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
