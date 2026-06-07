@@ -151,10 +151,10 @@ def Simulate(data_list, precision, run_name):
 
     # all sampled coordinates of each body are stored
     for body in range(NUM_BODIES):
-        path = my_dir / f"{run_name}_NEW_body{body}.csv"
+        path = my_dir / f"{run_name}_LAST_body{body}.csv"
         np.savetxt(path, frames[body], delimiter=",")
     # all sampled timesteps are stored
-    timestep_path = my_dir / f"{run_name}_NEW_timestep_sizes.csv"
+    timestep_path = my_dir / f"{run_name}_LAST_timestep_sizes.csv"
     np.savetxt(timestep_path, timestep_size_list, delimiter=",")
     
     return frames, timestep_size_list
@@ -308,7 +308,7 @@ def read_phase_space(NUM_BODIES, path, run_name):
     phase_space_data = []
     
     for b in range(NUM_BODIES):
-        path_b = str(path) + f"/{run_name}_NEW_body{b}.csv"
+        path_b = str(path) + f"/{run_name}_LAST_body{b}.csv"
         body_data = []
         
         with open(path_b, "r") as data:
@@ -399,7 +399,7 @@ def read_phase_space(NUM_BODIES, path, run_name):
 
 #now deepai experiment to systemize this
 configurations = [{"func": figure8, "name":"figure8"},{"func":figure8add, "name": "figure8add"},
-{"func": figure8sub, "name":"figuresub"},
+{"func": figure8sub, "name":"figure8sub"},
 {"func": yinyang, "name":"yinyang"},{"func":yinyangadd, "name": "yinyangadd"},
 {"func": yinyangsub, "name":"yinyangsub"},
 {"func": brouckeA1, "name":"brouckeA1"},{"func":brouckeA1add, "name": "brouckeA1add"},
@@ -427,7 +427,7 @@ for config in configurations:
 
     start_time = time.time()
     # the simulation
-    frames, timesteps = Simulate(config['func'], 0.00005, config['name'])
+    frames, timesteps = Simulate(config['func'], 0.0005, config['name'])
     end_time = time.time()
 
     # print summary after run of 1 configuration ends
@@ -439,11 +439,11 @@ for config in configurations:
     # first 10 rows for each body
     print("\nOutput of 10 rows for each body:")
     for body in range(NUM_BODIES):
-        print(f"\n{config['name']}_NEW_Body {body}:")
+        print(f"\n{config['name']}_LAST_Body {body}:")
         print(frames[body][:10])
     
     # first 10 lines of timestep sizes
-    timestep_path = path / f"{config['name']}_NEW_timestep_sizes.csv"
+    timestep_path = path / f"{config['name']}_LAST_timestep_sizes.csv"
     with open(timestep_path, "r") as f:
         for i, line in enumerate(f):
             if i >= 10:
