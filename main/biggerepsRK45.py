@@ -398,28 +398,10 @@ def read_phase_space(NUM_BODIES, path, run_name):
 #        print(line, end="")
 
 #now deepai experiment to systemize this
-configurations = [{"func": figure8, "name":"figure8"},{"func":figure8add, "name": "figure8add"},
-{"func": figure8sub, "name":"figure8sub"},
-{"func": yinyang, "name":"yinyang"},{"func":yinyangadd, "name": "yinyangadd"},
-{"func": yinyangsub, "name":"yinyangsub"},
-{"func": brouckeA1, "name":"brouckeA1"},{"func":brouckeA1add, "name": "brouckeA1add"},
-{"func": brouckeA1sub, "name":"brouckeA1sub"},
-{"func": brouckeA7, "name":"brouckeA7"},{"func":brouckeA7add, "name": "brouckeA7add"},
-{"func": brouckeA7sub, "name":"brouckeA7sub"},
-{"func": yinyang312ABeta, "name":"yinyang312ABeta"},{"func":yinyang312ABetaadd, "name": "yinyang312ABetaadd"},
-{"func": yinyang312ABetasub, "name":"yinyang312ABetasub"},
-{"func": oval_catface_starship, "name":"oval_catface_starship"},{"func":oval_catface_starship_add, "name": "oval_catface_starship_add"},
-{"func": oval_catface_starship_sub, "name":"oval_catface_starship_sub"},
-{"func": brouckeA11, "name":"brouckeA11"},{"func":brouckeA11add, "name": "brouckeA11add"},
-{"func": brouckeA11sub, "name":"brouckeA11sub"},
-{"func": yarn, "name":"yarn"},{"func":yarn_add, "name": "yarn_add"},
-{"func": yarn_sub, "name":"yarn_sub"},
-{"func": orbit_O3, "name":"orbit_O3"},{"func":orbit_O3add, "name": "orbit_O3add"},
-{"func": orbit_O3sub, "name":"orbit_O3sub"},
-{"func": orbit_O26, "name":"orbit_O26"},{"func":orbit_O26add, "name": "orbit_O26add"},
-{"func": orbit_O26sub, "name":"orbit_O26sub"},
-{"func": panio_trio_O50_04, "name":"panio_trio_O50_04"},{"func":panio_trio_O50_04_add, "name": "panio_trio_O50_04_add"},
-{"func": panio_trio_O50_04_sub, "name":"panio_trio_O50_sub"},]
+configurations = [{"func": butterflyI, "name":"butterflyI"},{"func":butterflyIadd, "name": "butterflyIadd"},
+{"func": butterflyIsub, "name":"butterflyIsub"},
+{"func": brouckeA2, "name":"brouckeA2"},{"func":brouckeA2add, "name": "brouckeA2add"},
+{"func": brouckeA2sub, "name":"brouckeA2sub"},]
 
 # loop through each configuration
 for config in configurations:
