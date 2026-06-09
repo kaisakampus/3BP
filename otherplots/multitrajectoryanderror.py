@@ -54,59 +54,73 @@ def hyperradius(bodies):
 def compute_error(r_main, r_add, r_sub):
     delta_r = np.abs(r_add - r_sub)
     return np.where(r_main != 0, (delta_r / r_main) * 100, 0)
+all_avg_errors = {}
 
-for name in dataset_names:
-    print(f"Processing {name}...")
+#for name in dataset_names:
+    #print(f"Processing {name}...")
 
     # --- load ---
-    try:
-        timesteps = np.loadtxt(os.path.join(base_dir, f"{name}_LAST_timestep_sizes.csv"))
-        bodies_main = load_variant(base_dir, name, suffix="")
-        bodies_add  = load_variant(base_dir, name, suffix="add")
-        bodies_sub  = load_variant(base_dir, name, suffix="sub")
-    except FileNotFoundError as e:
-        print(f"  Skipping — file not found: {e}")
-        continue
+    #try:
+        #timesteps = np.loadtxt(os.path.join(base_dir, f"{name}_LAST_timestep_sizes.csv"))
+        #bodies_main = load_variant(base_dir, name, suffix="")
+        #bodies_add  = load_variant(base_dir, name, suffix="add")
+        #bodies_sub  = load_variant(base_dir, name, suffix="sub")
+    #except FileNotFoundError as e:
+        #print(f"  Skipping — file not found: {e}")
+        #continue
 
-    cumulative_time = np.cumsum(timesteps)
+cumulative_time = np.cumsum(timesteps)
 
     # --- hyperradius ---
-    hr_main = hyperradius(bodies_main)
-    hr_add  = hyperradius(bodies_add)
-    hr_sub  = hyperradius(bodies_sub)
+hr_main = hyperradius(bodies_main)
+hr_add  = hyperradius(bodies_add)
+hr_sub  = hyperradius(bodies_sub)
 
 # after loading cumulative_time and hr_main/add/sub
-    min_len = min(len(cumulative_time), len(hr_main), len(hr_add), len(hr_sub))
-    cumulative_time = cumulative_time[:min_len]
-    hr_main = hr_main[:min_len]
-    hr_add  = hr_add[:min_len]
-    hr_sub  = hr_sub[:min_len]
+min_len = min(len(cumulative_time), len(hr_main), len(hr_add), len(hr_sub))
+cumulative_time = cumulative_time[:min_len]
+hr_main = hr_main[:min_len]
+hr_add  = hr_add[:min_len]
+hr_sub  = hr_sub[:min_len]
 
-    # --- plot 1: hyperradius over time ---
-    plt.figure(figsize=(10, 5))
-    plt.semilogy(cumulative_time, hr_sub,  color="turquoise", linewidth=1, label=f"{name} (r1_x−ε)")
-    plt.semilogy(cumulative_time, hr_add,  color="lime",      linewidth=1, label=f"{name} (r1_x+ε)")
-    plt.semilogy(cumulative_time, hr_main, color="deeppink",  linewidth=1, label=f"{name} r1_x")
-    plt.xlabel("simulation time")
-    plt.ylabel("hyperradius R (log)")
-    plt.title(f"Hyperradius over time — {name}")
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(os.path.join(base_dir, f"{name}_hyperradius.png"), dpi=150)
-    plt.close()
+error = compute_error(hr_main, hr_add, hr_sub)
+avg_error = np.mean(error)
+all_avg_errors[title] = avg_error
+print(f"  Average error: {avg_error:.4f}%")
+    # --- summary ---
+print("\n=== Average trajectory error per configuration ===")
+for title, avg in all_avg_errors.items():
+    print(f"  {title}: {avg:.4f}%")
+
+overall_avg = np.mean(list(all_avg_errors.values()))
+print(f"\n=== Overall average error across all configurations: {overall_avg:.4f}% ===")
+
+
+   # --- plot 1: hyperradius over time ---
+   # plt.figure(figsize=(10, 5))
+    #plt.semilogy(cumulative_time, hr_sub,  color="turquoise", linewidth=1, label=f"{name} (r1_x−ε)")
+    #plt.semilogy(cumulative_time, hr_add,  color="lime",      linewidth=1, label=f"{name} (r1_x+ε)")
+    #plt.semilogy(cumulative_time, hr_main, color="deeppink",  linewidth=1, label=f"{name} r1_x")
+    #plt.xlabel("simulation time")
+    #plt.ylabel("hyperradius R (log)")
+    #plt.title(f"Hyperradius over time — {name}")
+    #plt.legend()
+    #plt.tight_layout()
+    #plt.savefig(os.path.join(base_dir, f"{name}_hyperradius.png"), dpi=150)
+    #plt.close()
 
     # --- plot 2: trajectory error over time ---
-    error = compute_error(hr_main, hr_add, hr_sub)
+    #error = compute_error(hr_main, hr_add, hr_sub)
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(cumulative_time, error, color="purple", linewidth=1)
-    plt.xlabel("simulation time")
-    plt.ylabel("δ (%)")
-    plt.title(f"Trajectory error over time — {name}")
-    plt.tight_layout()
-    plt.savefig(os.path.join(base_dir, f"{name}_trajectory_error.png"), dpi=150)
-    plt.close()
+    #plt.figure(figsize=(10, 5))
+    #plt.plot(cumulative_time, error, color="purple", linewidth=1)
+    #plt.xlabel("simulation time")
+    #plt.ylabel("δ (%)")
+    #plt.title(f"Trajectory error over time — {name}")
+    #plt.tight_layout()
+    #plt.savefig(os.path.join(base_dir, f"{name}_trajectory_error.png"), dpi=150)
+    #plt.close()
 
-    print(f"  Saved plots for {name}.")
+    #print(f"  Saved plots for {name}.")
 
 print("Done.")
