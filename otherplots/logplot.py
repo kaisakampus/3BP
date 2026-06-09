@@ -86,16 +86,17 @@ import matplotlib.pyplot as plt
 import os
 
 base_dir = r"C:\Users\kaisa\My Drive\Simulated_Data"
-dataset_names = ["figure8", "brouckeA2", "loopendedtriangles", "ovalswithflourishes", "orbit_O2", "orbit_O3", "orbit_O26"]
+dataset_names = ["figure8", "brouckeA7","brouckeA2", "brouckeA1", "brouckeA11", "yarn_", "butterflyI", "paino_trio_O50_04_", "orbit_O3", "orbit_O26",
+                 "yinyang", "yinyang312ABeta"]
 
 for name in dataset_names:
     # Construct file paths
     original_files = [
-        os.path.join(base_dir, f"{name}.csv"),
-        os.path.join(base_dir, f"{name}add.csv"),
-        os.path.join(base_dir, f"{name}sub.csv")
+        os.path.join(base_dir, f"{name}_LAST.csv"),
+        os.path.join(base_dir, f"{name}add_LAST.csv"),
+        os.path.join(base_dir, f"{name}sub_LAST.csv")
     ]
-    timestep_file = os.path.join(base_dir, f"{name}_timestep_sizes.csv")
+    timestep_file = os.path.join(base_dir, f"{name}_LAST_timestep_sizes.csv")
     
     # Load data
     original_bodies = [np.loadtxt(f, delimiter=",") for f in original_files]

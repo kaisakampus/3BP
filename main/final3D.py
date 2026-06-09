@@ -8,9 +8,11 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 from matplotlib.widgets import Button
 from matplotlib.lines import Line2D
 import time
+import os
 
-# base line has to be changed at the end to get the desired configuration
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\panio_trio_O50_sub_NEW"
+# base line has to be changed at the end to get the desired configuration"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\brouckeA11_LAST"
+outpath = r"C:\Users\kaisa\My Drive\Simulated_Data\VIDEO" + "\\" + os.path.basename(base) + "_simulation.mp4"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
@@ -37,7 +39,7 @@ ax.set_ylabel("y [–]")
 ax.set_zlabel("z [–]")
 
 # change the name accordingly
-ax.set_title("O50 -ε=1e-4 in 3D simulation")
+ax.set_title("broucke A11 in 3D simulation")
 def update(frame):
     global sim_start_time, pause_start, total_paused
 
