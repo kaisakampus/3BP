@@ -57,7 +57,7 @@ def update(frame):
         (trail_segs2, dot2, body2),
     ])
 
-    info_text.set_text("step: {:>6} / {}\nT    = {:.2f}s".format(f, N, elapsed))
+    #info_text.set_text("step: {:>6} / {}\nT    = {:.2f}s".format(f, N, elapsed))
 
     state["frame"] = (f + STEP) % N
     return []
