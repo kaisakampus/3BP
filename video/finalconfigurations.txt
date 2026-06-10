@@ -1,0 +1,13 @@
+Rest of the plots will be produced for:
+A1
+A2
+A7
+A11
+ButterflyI: redo 3D
+Yarn: redo 3D
+YinyangIII12Aa: redo 3D
+YinyangIII12Ab
+O3
+O26
+O50
+Figure8
