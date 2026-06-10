@@ -51,36 +51,11 @@ def update(frame):
 
     f       = state["frame"]
 
-    # ai input begins
-    #margin = 10  # adjust to taste
-    #cx = np.mean([body0[f,0], body1[f,0], body2[f,0]])
-    #cy = np.mean([body0[f,1], body1[f,1], body2[f,1]])
-    #ax.set_xlim(cx - margin, cx + margin)
-    #ax.set_ylim(cy - margin, cy + margin)
-    #elapsed = time.time() - sim_start_time - total_paused
-    # ai input ends
-
     draw_trails(f, [
         (trail_segs0, dot0, body0),
         (trail_segs1, dot1, body1),
         (trail_segs2, dot2, body2),
     ])
-
-# Determine current particle colors
-    # Replace these with your actual color logic if available
-    #color0 = "deepskyblue"   # For particle 0
-    #color1 = "red"           # For particle 1
-    #color2 = "lightgreen"    # For particle 2
-
-    #for scatter in trail_segs0:
-        #scatter.set_facecolors('none')
-        #scatter.set_edgecolors('turquoise')
-    #for scatter in trail_segs1:
-        #scatter.set_facecolors('none')
-        #scatter.set_edgecolors('deeppink')
-    #for scatter in trail_segs2:
-        #scatter.set_facecolors('none')
-        #scatter.set_edgecolors('lime')'''
 
     info_text.set_text("step: {:>6} / {}\nT    = {:.2f}s".format(f, N, elapsed))
 
@@ -109,10 +84,12 @@ alphas = [float((i+1)**1 / N_SEG**1) for i in range(N_SEG)]
 #trail_segs0 = [ax.plot([], [], [], color="turquoise", lw=1, alpha=alphas[i])[0] for i in range(N_SEG)]
 #trail_segs1 = [ax.plot([], [], [], color="deeppink",  lw=1, alpha=alphas[i])[0] for i in range(N_SEG)]
 #trail_segs2 = [ax.plot([], [], [], color="lime",      lw=1, alpha=alphas[i])[0] for i in range(N_SEG)]
+
 #trail_segs0 = [ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='turquoise', ms=6, alpha=alphas[i])[0] for i in range(N_SEG)]
 #trail_segs1 = [ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='deeppink', ms=6, alpha=alphas[i])[0] for i in range(N_SEG)]
 #trail_segs2 = [ax.plot([], [], [], marker='o', markerfacecolor='none', markeredgecolor='lime', ms=6, alpha=alphas[i])[0] for i in range(N_SEG)]
-# Instead, create scatter plots for the trails:
+
+# ai recommended to create scatter plots for the trails:
 trail_segs0 = [ax.scatter([], [], [], marker='o', facecolors='none', edgecolors='turquoise', s=36, alpha=alphas[i]) for i in range(N_SEG)]
 trail_segs1 = [ax.scatter([], [], [], marker='o', facecolors='none', edgecolors='deeppink', s=36, alpha=alphas[i]) for i in range(N_SEG)]
 trail_segs2 = [ax.scatter([], [], [], marker='o', facecolors='none', edgecolors='lime', s=36, alpha=alphas[i]) for i in range(N_SEG)]
@@ -155,32 +132,15 @@ def draw_trails(f, body_list):
 
     for segs, dot, body in body_list:
 
-        #if segs is trail_segs0:
-            #color = 'turquoise'
-        #elif segs is trail_segs1:
-            #color = 'deeppink'
-        #elif segs is trail_segs2:
-            #color = 'lime'
-        #else:
-            #color = 'grey'  # fallback
-
         for i, seg in enumerate(segs):
             s = start + i * seg_len
             e = start + (i + 1) * seg_len + 1
             if i == N_SEG - 1:
                 e = f + 1
             if s >= f:
-                #seg.set_data([], [])
-                #seg.set_3d_properties([])
                 seg._offsets3d = (np.empty(0),np.empty(0), np.empty(0))
-                #seg.set_3d_properties(np.empty(0), zdir='z')
             else:
                 seg._offsets3d=(body[s:e, 0], body[s:e, 1], body[s:e, 2])
-                #seg.set_offsets(body[s:e, :2])
-                #seg.set_3d_properties(body[s:e, 2], zdir='z')
-                #seg.set_data(body[s:e, 0], body[s:e, 1])
-                #seg.set_3d_properties(body[s:e, 2])
-            #seg.set_facecolor('none')
         dot.set_data([body[f, 0]], [body[f, 1]])
         dot.set_3d_properties([body[f, 2]])
 
@@ -193,38 +153,15 @@ def update(frame):
     if sim_start_time is None:
         sim_start_time = time.time()
 
-    f       = state["frame"]
+    f = state["frame"]
 
-    # ai input begins
-    #margin = 1  # adjust to taste
-    #cx = np.mean([body0[f,0], body1[f,0], body2[f,0]])
-    #cy = np.mean([body0[f,1], body1[f,1], body2[f,1]])
-    #ax.set_xlim(cx - margin, cx + margin)
-    #ax.set_ylim(cy - margin, cy + margin)
     elapsed = time.time() - sim_start_time - total_paused
-    # ai input ends
 
     draw_trails(f, [
         (trail_segs0, dot0, body0),
         (trail_segs1, dot1, body1),
         (trail_segs2, dot2, body2),
     ])
-
-# Determine current particle colors
-    # Replace these with your actual color logic if available
-    #color0 = "deepskyblue"   # For particle 0
-    #color1 = "red"           # For particle 1
-    #color2 = "lightgreen"    # For particle 2
-
-    #for scatter in trail_segs0:
-        #scatter.set_facecolors('none')
-        #scatter.set_edgecolors('turquoise')
-    #for scatter in trail_segs1:
-        #scatter.set_facecolors('none')
-        #scatter.set_edgecolors('deeppink')
-    #for scatter in trail_segs2:
-        #scatter.set_facecolors('none')
-        #scatter.set_edgecolors('lime')'''
 
     info_text.set_text("step: {:>6} / {}\nT    = {:.2f}s".format(f, N, elapsed))
 

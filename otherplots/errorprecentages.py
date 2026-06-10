@@ -1,6 +1,7 @@
 import numpy as np
 import os
 
+# to produce these systematically, I used ai to save time
 base_dir = r"C:\Users\kaisa\My Drive\Simulated_Data"
 
 dataset_names = [("brouckeA2","broucke A2 ±ε=1e-4",""),("butterflyI","butterfly I ±ε=1e-4",""),
@@ -30,14 +31,14 @@ def compute_error(r_main, r_add, r_sub):
 all_avg_errors = {}
 
 for name, title, sep in dataset_names:
-    print(f"Processing {name}...")
+    print(f"{name}")
     try:
         timesteps   = np.loadtxt(os.path.join(base_dir, f"{name}_LAST_timestep_sizes.csv"))
         bodies_main = load_variant(base_dir, name, suffix="",    sep=sep)
         bodies_add  = load_variant(base_dir, name, suffix="add", sep=sep)
         bodies_sub  = load_variant(base_dir, name, suffix="sub", sep=sep)
     except FileNotFoundError as e:
-        print(f"  Skipping — file not found: {e}")
+        print(f"file not found: {e}")
         continue
 
     hr_main = hyperradius(bodies_main)
@@ -50,15 +51,15 @@ for name, title, sep in dataset_names:
     hr_sub  = hr_sub[:min_len]
 
     avg_error = np.mean(compute_error(hr_main, hr_add, hr_sub))
-    #avg_error = np.median(compute_error(hr_main, hr_add, hr_sub))
+    #avg_error = np.median(compute_error(hr_main, hr_add, hr_sub)) median does not help me much here though
     all_avg_errors[title] = avg_error
     print(f"  Average error: {avg_error:.4f}%")
 
-print("\n=== Average trajectory error per configuration ===")
+print("\naverage trajectory error per configuration")
 for title, avg in all_avg_errors.items():
     print(f"  {title}: {avg:.4f}%")
 
 overall_avg = np.mean(list(all_avg_errors.values()))
 #overall_avg = np.median(list(all_avg_errors.values()))
-print(f"\n=== Overall average error across all configurations: {overall_avg:.4f}% ===")
-print("Done.")
+print(f"\noverall average error across all configurations: {overall_avg:.4f}%")
+print("complete")

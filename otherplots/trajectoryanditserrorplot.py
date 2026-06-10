@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+# to produce these systematically, I used ai to save time
 base_dir = r"C:\Users\kaisa\My Drive\Simulated_Data"
 
 dataset_names = [
@@ -25,10 +26,17 @@ def load_variant(base_dir, name, suffix="", sep=""):
         bodies.append(np.loadtxt(path, delimiter=","))
     return bodies
 
+# Hyperradius definition from:
+# Šuvakov & Dmitrašinović (2013), "Three Classes of Newtonian Three-Body Planar Periodic Orbits"
+# arXiv:1303.0181, eq. used: R = sqrt(|r1|^2 + |r2|^2 + |r3|^2)
+# hyperradius: overall size of the three-body system
+#hyperradius = np.sqrt(mag0**2 + mag1**2 + mag2**2)
+
 def hyperradius(bodies):
     mags = [np.sqrt(b[:,0]**2 + b[:,1]**2 + b[:,2]**2) for b in bodies]
     return np.sqrt(mags[0]**2 + mags[1]**2 + mags[2]**2)
 
+# δ = (Δr / r) * 100, where Δr = |r_add - r_sub|
 def compute_error(r_main, r_add, r_sub):
     delta_r = np.abs(r_add - r_sub)
     return np.where(r_main != 0, (delta_r / r_main) * 100, 0)
@@ -57,7 +65,7 @@ for name, title, sep in dataset_names:
 
     error = compute_error(hr_main, hr_add, hr_sub)
 
-    # --- plot 1: hyperradius ---
+    # hyperradius plot
     plt.figure(figsize=(10, 5))
     plt.semilogy(cumulative_time, hr_sub,  color="turquoise", linewidth=1, label="r1_x−ε")
     plt.semilogy(cumulative_time, hr_add,  color="lime",      linewidth=1, label="r1_x+ε")
@@ -70,7 +78,7 @@ for name, title, sep in dataset_names:
     plt.savefig(os.path.join(base_dir, f"{name}_hyperradius.png"), dpi=150)
     plt.close()
 
-    # --- plot 2: trajectory error ---
+    # trajectory error plot
     plt.figure(figsize=(10, 5))
     plt.plot(cumulative_time, error, color="purple", linewidth=1)
     plt.xlabel("simulation time")
@@ -82,4 +90,4 @@ for name, title, sep in dataset_names:
 
     print(f"  Saved: {name}_hyperradius.png + {name}_trajectory_error.png")
 
-print("Done.")
+print("Complete")
