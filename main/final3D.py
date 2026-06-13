@@ -11,7 +11,7 @@ import time
 import os
 
 # base line has to be changed at the end to get the desired configuration"
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\yinyang_LAST"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\yarn_sub_LAST"
 outpath = r"C:\Users\kaisa\My Drive\Simulated_Data\VIDEO" + "\\" + os.path.basename(base) + "_simulation.mp4"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
@@ -39,7 +39,7 @@ ax.set_ylabel("y [–]")
 ax.set_zlabel("z [–]")
 
 # change the name accordingly
-ax.set_title("Yin-Yang III 12.A.a in 3D simulation")
+ax.set_title("Yarn -ε in 3D simulation")
 def update(frame):
     global sim_start_time, pause_start, total_paused
 
@@ -102,9 +102,9 @@ for scatter in trail_segs2:
     scatter.set_color('lime')
 
 # faint ghost of full orbit
-#ax.plot(body0[:, 0], body0[:, 1], body0[:, 2], color="grey",     lw=0.3, alpha=0.2)
-#ax.plot(body1[:, 0], body1[:, 1], body1[:, 2], color="grey", lw=0.3, alpha=0.2)
-#ax.plot(body2[:, 0], body2[:, 1], body2[:, 2], color="grey",    lw=0.3, alpha=0.2)
+ax.plot(body0[:, 0], body0[:, 1], body0[:, 2], color="grey",     lw=0.3, alpha=0.2)
+ax.plot(body1[:, 0], body1[:, 1], body1[:, 2], color="grey", lw=0.3, alpha=0.2)
+ax.plot(body2[:, 0], body2[:, 1], body2[:, 2], color="grey",    lw=0.3, alpha=0.2)
 
 # animated dots
 dot0, = ax.plot([], [], [], '-', color="deepskyblue", ms=4, zorder=6)

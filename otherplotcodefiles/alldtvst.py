@@ -4,17 +4,9 @@ import matplotlib.pyplot as plt
 BASE_PATH = r"C:\Users\kaisa\My Drive\Simulated_Data"
 
 orbits = [
-    ("yinyang","yinyang III.A.a ±ε=1e-4","yinyang","yinyangadd","yinyangsub"),
     ("yinyang312ABeta","yinyang III 12.A.b ±ε=1e-4","yinyang312ABeta","yinyang312ABetaadd","yinyang312ABetasub"),
     ("orbit_O3","O3 ±ε=1e-4","orbit_O3","orbit_O3add","orbit_O3sub"),
-    ("orbit_O26","O26 ±ε=1e-4","orbit_O26","orbit_O26add","orbit_O26sub"),
-    ("figure8","figure 8 ±ε=1e-4","figure8","figure8add","figure8sub"),
-    ("yarn","yarn ±ε=1e-4","yarn","yarn_add","yarn_sub"),
-    ("butterflyI","butterfly I ±ε=1e-4","butterflyI","butterflyIadd","butterflyIsub"),
-    ("brouckeA1","broucke A1 ±ε=1e-4","brouckeA1","brouckeA1add","brouckeA1sub"),
-    ("brouckeA7","broucke A7 ±ε=1e-4","brouckeA7","brouckeA7add","brouckeA7sub"),
     ("brouckeA11","broucke A11 ±ε=1e-4","brouckeA11","brouckeA11add","brouckeA11sub"),
-    #("panio_trio_O50_04","O50 ±ε=1e-4","panio_trio_O50_04","panio_trio_O50_04_add","panio_trio_O50_04_sub"),
 ]
 
 def load(main_name, sub_name, add_name):

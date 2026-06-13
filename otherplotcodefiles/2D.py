@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import splprep, splev
 # load all three bodies [x, y, z, vx, vy, vz]
-base = r"C:\Users\kaisa\My Drive\Simulated_Data\butterflyI_LAST"
+base = r"C:\Users\kaisa\My Drive\Simulated_Data\brouckeA2_LAST"
 body0 = np.loadtxt(base + "_body0.csv", delimiter=",")
 body1 = np.loadtxt(base + "_body1.csv", delimiter=",")
 body2 = np.loadtxt(base + "_body2.csv", delimiter=",")
@@ -15,7 +15,7 @@ body0 = body0[:N]
 body1 = body1[:N]
 body2 = body2[:N]
 
-def smooth(x, y, n=2000, s=0.0001):
+def smooth(x, y, n=2000, s=0):
     tck, u = splprep([x, y], s=s)
     u_fine = np.linspace(0, 1, n)
     return splev(u_fine, tck)
@@ -38,7 +38,7 @@ ax.scatter(body2[0, 0], body2[0, 1], color="darkgreen", s=40, zorder=5)
 
 ax.set_xlabel("x [–]")
 ax.set_ylabel("y [–]")
-ax.set_title("Butterfly I in 2D")
+ax.set_title("Broucke A2 in 2D")
 ax.set_aspect("equal")
 #ax.legend()
 plt.tight_layout()

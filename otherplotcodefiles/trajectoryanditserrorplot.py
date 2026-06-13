@@ -6,16 +6,8 @@ import os
 base_dir = r"C:\Users\kaisa\My Drive\Simulated_Data"
 
 dataset_names = [
-    ("brouckeA2",       "broucke A2 ±ε=1e-4",          ""),
-    ("butterflyI",      "butterfly I ±ε=1e-4",          ""),
-    ("figure8",         "figure 8 ±ε=1e-4",             ""),
-    ("yinyang",         "yinyang III 12.A.a ±ε=1e-4",   ""),
-    ("brouckeA1",       "broucke A1 ±ε=1e-4",           ""),
-    ("brouckeA7",       "broucke A7 ±ε=1e-4",           ""),
     ("yinyang312ABeta", "yinyang III 12.A.b ±ε=1e-4",   ""),
-    ("orbit_O3",        "O3 ±ε=1e-4",                   ""),
-    ("orbit_O26",       "O26 ±ε=1e-4",                  ""),
-    ("brouckeA11",       "broucke A11 ±ε=1e-4",         ""),
+    #("orbit_O3",        "O3 ±ε=1e-4",                   ""),
 ]
 
 def load_variant(base_dir, name, suffix="", sep=""):
@@ -66,28 +58,46 @@ for name, title, sep in dataset_names:
     error = compute_error(hr_main, hr_add, hr_sub)
 
     # hyperradius plot
-    plt.figure(figsize=(10, 5))
-    plt.semilogy(cumulative_time, hr_sub,  color="turquoise", linewidth=1, label="r1_x−ε")
-    plt.semilogy(cumulative_time, hr_add,  color="lime",      linewidth=1, label="r1_x+ε")
-    plt.semilogy(cumulative_time, hr_main, color="deeppink",  linewidth=1, label="r1_x")
-    plt.xlabel("simulation time")
-    plt.ylabel("hyperradius R (log)")
-    plt.title(f"Hyperradius over time — {title}")
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(os.path.join(base_dir, f"{name}_hyperradius.png"), dpi=150)
-    plt.close()
+    #plt.figure(figsize=(10, 5))
+    #plt.semilogy(cumulative_time, hr_sub,  color="turquoise", linewidth=1, label="r1_x−ε")
+    #plt.semilogy(cumulative_time, hr_add,  color="lime",      linewidth=1, label="r1_x+ε")
+    #plt.semilogy(cumulative_time, hr_main, color="deeppink",  linewidth=1, label="r1_x")
+    #plt.xlabel("simulation time")
+    #plt.ylabel("hyperradius R (log)")
+    #plt.title(f"Hyperradius over time — {title}")
+    #plt.legend()
+    #plt.tight_layout()
+    #plt.savefig(os.path.join(base_dir, f"{name}_hyperradius.png"), dpi=150)
+    #plt.close()
 
     # trajectory error plot
-    plt.figure(figsize=(10, 5))
-    plt.plot(cumulative_time, error, color="purple", linewidth=1)
-    plt.xlabel("simulation time")
-    plt.ylabel("δ (%)")
-    plt.title(f"Trajectory error over time — {title}")
-    plt.tight_layout()
-    plt.savefig(os.path.join(base_dir, f"{name}_trajectory_error.png"), dpi=150)
-    plt.close()
+    #plt.figure(figsize=(10, 5))
+    #plt.plot(cumulative_time, error, color="purple", linewidth=1)
+    #plt.xlabel("simulation time")
+    #plt.ylabel("δ (%)")
+    #plt.title(f"Trajectory error over time — {title}")
+    #plt.tight_layout()
+    #plt.savefig(os.path.join(base_dir, f"{name}_trajectory_error.png"), dpi=150)
+    #plt.close()
 
-    print(f"  Saved: {name}_hyperradius.png + {name}_trajectory_error.png")
+    #print(f"  Saved: {name}_hyperradius.png + {name}_trajectory_error.png")
+
+    # hyperradius plot chopped
+    ranges = [(0, 1600), (1600, 3200),(3200,4800)]
+    for i, (lo, hi) in enumerate(ranges):
+        plt.figure(figsize=(10, 4))
+        plt.semilogy(cumulative_time, hr_sub,  color="turquoise", linewidth=1, label="r1_x−ε")
+        plt.semilogy(cumulative_time, hr_add,  color="lime",      linewidth=1, label="r1_x+ε")
+        plt.semilogy(cumulative_time, hr_main, color="deeppink",  linewidth=1, label="r1_x")
+        plt.xlim(lo, hi)
+        plt.xlabel("simulation time")
+        plt.ylabel("hyperradius R (log)")
+        plt.title(f"Hyperradius over time — {title}")
+        #plt.legend()
+        plt.legend(loc="upper right")
+        plt.tight_layout()
+        plt.savefig(os.path.join(base_dir, f"{name}_hyperradius_part{i+1}.png"), dpi=150)
+        plt.show()
+        plt.close()
 
 print("Complete")
